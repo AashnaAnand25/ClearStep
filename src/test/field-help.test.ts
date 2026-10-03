@@ -181,14 +181,12 @@ it.each([
   ["w9-classification", "https://www.irs.gov/pub/irs-pdf/fw9.pdf", "W-9"],
   ["ds11-signature", "https://eforms.state.gov/Forms/ds11_pdf.PDF", "DS-11"],
 ])("grounds %s in its own form and official source", async (fieldId, source, form) => {
-  const fetcher = vi
-    .fn()
-    .mockResolvedValue(
-      Response.json({
-        done: true,
-        response: "Review the official instructions for this field before completing the form.",
-      }),
-    );
+  const fetcher = vi.fn().mockResolvedValue(
+    Response.json({
+      done: true,
+      response: "Review the official instructions for this field before completing the form.",
+    }),
+  );
   const handler = createFieldHelpHandler(fetcher);
   const result = await (await handler(req({ fieldId, mode: "explain" }))).json();
   expect(result).toMatchObject({ isAI: true, fieldId, source: { url: source } });
