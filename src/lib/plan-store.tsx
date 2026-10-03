@@ -96,7 +96,15 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       const savedAccessibility = localStorage.getItem(SETTINGS_KEY);
       if (savedAccessibility) {
-        setAccessibilityState({ ...defaultAccessibility, ...JSON.parse(savedAccessibility) });
+        const saved: unknown = JSON.parse(savedAccessibility);
+        if (saved && typeof saved === "object") {
+          const values = saved as Record<string, unknown>;
+          setAccessibilityState({
+            textSize: values["textSize"] === "large" ? "large" : "default",
+            highContrast: values["highContrast"] === true,
+            reducedMotion: values["reducedMotion"] === true,
+          });
+        }
       } else if (localStorage.getItem(TEXT_KEY) === "1") {
         setAccessibilityState({ ...defaultAccessibility, textSize: "large" });
       }

@@ -199,7 +199,9 @@ describe("ClearStep journeys", () => {
       await screen.findByRole("heading", { name: "Accessibility settings" }),
     ).toBeInTheDocument();
     expect(document.documentElement).toHaveClass("text-large");
-    fireEvent.click(screen.getByRole("tab", { name: "Contrast" }));
+    fireEvent.keyDown(screen.getByRole("tab", { name: "Text" }), { key: "ArrowRight" });
+    expect(screen.getByRole("tab", { name: "Contrast" })).toHaveFocus();
+    expect(screen.getByRole("tab", { name: "Contrast" })).toHaveAttribute("aria-selected", "true");
     const contrast = screen.getByRole("checkbox", { name: "High contrast" });
     fireEvent.click(contrast);
     expect(document.documentElement).toHaveClass("high-contrast");

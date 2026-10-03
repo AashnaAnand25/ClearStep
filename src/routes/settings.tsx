@@ -49,6 +49,25 @@ function SettingsPage() {
               role="tab"
               aria-selected={activeTab === id}
               aria-controls={`${id}-settings`}
+              tabIndex={activeTab === id ? 0 : -1}
+              onKeyDown={(event) => {
+                const index = tabs.findIndex((tab) => tab.id === id);
+                const next =
+                  event.key === "ArrowRight"
+                    ? (index + 1) % tabs.length
+                    : event.key === "ArrowLeft"
+                      ? (index + tabs.length - 1) % tabs.length
+                      : event.key === "Home"
+                        ? 0
+                        : event.key === "End"
+                          ? tabs.length - 1
+                          : -1;
+                if (next < 0) return;
+                event.preventDefault();
+                const nextTab = tabs[next]!;
+                setActiveTab(nextTab.id);
+                document.getElementById(`${nextTab.id}-tab`)?.focus();
+              }}
               onClick={() => setActiveTab(id)}
               className="inline-flex min-h-12 items-center gap-2 rounded-lg px-4 font-bold text-muted-foreground hover:bg-accent aria-selected:bg-primary-soft aria-selected:text-primary"
             >
