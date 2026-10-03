@@ -24,7 +24,7 @@ export interface PlanState {
   reminderDate: string | null;
 }
 
-const KEY = "clearstep.plan.v1";
+import { clearPlan, readPlan, writePlan } from "./plan-persistence";
 const TEXT_KEY = "clearstep.largeText";
 
 const emptyChecklist = () =>
@@ -74,22 +74,11 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as PlanState;
-        if (parsed.version === 1 && parsed.answers && parsed.stagesDone && !parsed.isSample) {
-          setPlan({
-            ...initialPlan(),
-            ...parsed,
-            checklist: { ...emptyChecklist(), ...parsed.checklist },
-          });
-          savedPlan.current = {
-            ...initialPlan(),
-            ...parsed,
-            checklist: { ...emptyChecklist(), ...parsed.checklist },
-          };
-          if (parsed.intakeComplete) setWelcomeBack(true);
-        }
+      const restored = readPlan(localStorage);
+      if (restored) {
+        setPlan(restored);
+        savedPlan.current = restored;
+        setWelcomeBack(restored.intakeComplete);
       }
       setLargeTextState(localStorage.getItem(TEXT_KEY) === "1");
     } catch {
@@ -102,7 +91,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     if (!hydrated || plan.isSample) return;
     savedPlan.current = plan;
     try {
-      localStorage.setItem(KEY, JSON.stringify(plan));
+      writePlan(localStorage, plan);
     } catch {
       /* ignore */
     }
@@ -138,7 +127,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     setWelcomeBack(false);
     setPlan(initialPlan());
     try {
-      localStorage.removeItem(KEY);
+      clearPlan(localStorage);
     } catch {
       /* ignore */
     }

@@ -68,3 +68,9 @@ Run 3–5 usability sessions and record actual completion/errors. Include older 
 8. Check narrow screens, larger text, keyboard-only navigation, and reset cancellation/confirmation.
 
 No login, uploads, eligibility calculations, live crawling, or extra government services are required for the hackathon baseline.
+
+## Person 4 implementation handoff — October 3, 2026
+
+Work is on `feature/progress-reminders`. The existing controls and shared layout are preserved. See [the early state/persistence contract](docs/PERSON4_HANDOFF.md) and [actual test findings, usability protocol, and demo script](docs/PERSON4_TESTING_AND_DEMO.md).
+
+Added allowlisted version-1 storage helpers in `src/lib/plan-persistence.ts`, integrated into the provider, and validated all-day calendar export with date-boundary, escaping and UTF-8 folding coverage. All 45 tests and typechecking pass; lint has no errors (8 existing warnings); production build passes. Stable checklist IDs follow Person 2's completed handoff. No participant sessions, real calendar-app import, final recording, or direct Person 1 receipt are claimed. Those require participants and final recording/submission coordination.

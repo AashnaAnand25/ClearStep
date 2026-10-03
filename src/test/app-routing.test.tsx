@@ -114,6 +114,59 @@ describe("ClearStep journeys", () => {
     expect(screen.getByLabelText("Reminder date")).toHaveValue("2026-10-20");
   });
 
+  it("persists the date and unfinished action across a route remount", async () => {
+    localStorage.setItem(
+      "clearstep.plan.v1",
+      JSON.stringify({
+        ...initialPlan(),
+        intakeComplete: true,
+        answers: { help: "person", firstTime: "yes" },
+        stagesDone: { start: true, provider: false },
+      }),
+    );
+    const view = renderAt("/plan");
+    const income = await screen.findByRole("group", {
+      name: "Status for Income forms, such as a W-2 or 1099",
+    });
+    fireEvent.click(within(income).getByRole("button", { name: "Need help" }));
+    fireEvent.change(screen.getByLabelText("Reminder date"), { target: { value: "2028-02-29" } });
+    view.unmount();
+    renderAt("/plan");
+    expect(await screen.findByText("Welcome back. Here's where you left off.")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Your next step" })).toHaveTextContent(
+      "Get help with: Income forms",
+    );
+    expect(screen.getByLabelText("Reminder date")).toHaveValue("2028-02-29");
+  });
+
+  it("does not complete a step on external navigation and supports reset cancellation", async () => {
+    localStorage.setItem(
+      "clearstep.plan.v1",
+      JSON.stringify({
+        ...initialPlan(),
+        intakeComplete: true,
+        answers: { help: "person", firstTime: "yes" },
+      }),
+    );
+    renderAt("/plan");
+    const next = await screen.findByRole("region", { name: "Your next step" });
+    const link = within(next).getByRole("link", { name: /Open IRS.gov/ });
+    link.addEventListener("click", (event) => event.preventDefault());
+    const before = localStorage.getItem("clearstep.plan.v1");
+    fireEvent.click(link);
+    expect(localStorage.getItem("clearstep.plan.v1")).toBe(before);
+    expect(screen.getByText("0 of 3 stages done")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Reset my plan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Keep my plan" }));
+    expect(localStorage.getItem("clearstep.plan.v1")).toBe(before);
+    fireEvent.click(screen.getByRole("button", { name: "Reset my plan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    expect(
+      await screen.findByRole("heading", { name: "Get help with my taxes" }),
+    ).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem("clearstep.plan.v1")!).intakeComplete).toBe(false);
+  });
+
   it("restores larger text and allows it to be switched off", async () => {
     localStorage.setItem("clearstep.largeText", "1");
     renderAt("/");
