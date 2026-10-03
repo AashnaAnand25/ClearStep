@@ -1,8 +1,9 @@
-const fields = {
-  "multiple-jobs": ["Multiple jobs or spouse works", "W-4 · Step 2"],
-  "other-income": ["Other income (not from jobs)", "W-4 · Step 4(a)"],
-  "extra-withholding": ["Extra withholding", "W-4 · Step 4(c)"],
-};
+const forms = await fetch(new URL("forms.json", import.meta.url)).then((r) => r.json());
+const fields = Object.fromEntries(
+  forms.flatMap((form) =>
+    form.fields.map((field) => [field.id, { ...field, source: form.source }]),
+  ),
+);
 const $ = (id) => document.getElementById(id);
 const extension = location.protocol === "chrome-extension:";
 let fieldId = null;
@@ -11,17 +12,18 @@ let sequence = 0;
 async function selectField(id, error = "") {
   fieldId = Object.hasOwn(fields, id) ? id : null;
   stopSpeaking();
+  $("listen").hidden = true;
   sequence++;
-  $("field-label").textContent = fieldId ? fields[fieldId][0] : "Choose a supported field";
+  $("field-label").textContent = fieldId ? fields[fieldId].label : "Choose a supported field";
   $("field-step").textContent = fieldId
-    ? fields[fieldId][1]
-    : "Supports Step 2, Step 4(a), and Step 4(c).";
+    ? fields[fieldId].step
+    : "Choose a field from the selected form.";
   if (!fieldId) {
     document.querySelector(".answer").setAttribute("aria-busy", "false");
     $("answer-badge").textContent = "WAITING FOR A FIELD";
     $("answer-text").textContent =
       error ||
-      "Click a supported W-4 field. We do not read names, identification numbers, or your typed answers.";
+      "Click a supported field. We do not read names, identification numbers, or your typed answers.";
     $("source").hidden = true;
     $("retry").hidden = true;
     return;
@@ -34,6 +36,10 @@ async function explain() {
   $("listen").hidden = true;
   const ticket = ++sequence;
   const selected = fieldId;
+  $("source").querySelector("a").href = fields[selected].source.url;
+  $("source").querySelector("a").textContent = fields[selected].source.title + " ↗";
+  $("source").querySelector("p").textContent =
+    "Official source · reviewed " + fields[selected].source.reviewedAt;
   $("answer-badge").textContent = "READING THE INSTRUCTIONS";
   $("answer-text").textContent =
     "Reading the reviewed instructions… The first explanation may take a little longer while the model loads.";
@@ -64,6 +70,10 @@ async function explain() {
       : "REVIEWED GUIDE · AI UNAVAILABLE";
     $("answer-text").textContent = result.explanation;
     $("listen").hidden = !("speechSynthesis" in window);
+    const source = fields[selected].source;
+    $("source").querySelector("a").href = source.url;
+    $("source").querySelector("a").textContent = source.title + " ↗";
+    $("source").querySelector("p").textContent = "Official source · reviewed " + source.reviewedAt;
     $("source").hidden = false;
     $("retry").hidden = result.isAI;
     if (result.status === "busy") $("answer-badge").textContent = "REVIEWED GUIDE · AI IS BUSY";

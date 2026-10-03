@@ -53,3 +53,11 @@ Model: [Qwen2.5 7B](https://ollama.com/library/qwen2.5:7b), an open-weight model
 ## 30-second demo segment
 
 “I used to leave the form every time a label confused me. ClearStep brings the explanation to the field. Here, ‘extra withholding’ becomes a short explanation. If that is still too much, I can ask for simpler wording. The official IRS instructions are one click away. This demonstration runs real AI on the laptop. It sends the field identifier, not anything I type, and it never chooses my tax answers.”
+
+## Additional guided forms
+
+The web practice chooser now includes W-4, W-9, and DS-11, with three selected sections each. This is guidance, not full form completion or submission. Practice controls do not collect actual names, taxpayer numbers, addresses, or signatures. Switching forms clears practice selections and the previous explanation.
+
+The shared catalog is public/companion/forms.json. Each form owns its official source URL and reviewed evidence, used by both the UI and server. W-9 evidence was checked against https://www.irs.gov/pub/irs-pdf/fw9.pdf and passport evidence against https://eforms.state.gov/Forms/ds11_pdf.PDF on October 3, 2026. This was assistant source review, not professional tax/legal review.
+
+External Chrome extension label detection remains limited to its three W-4 labels. The additional forms are supported in the built-in web companion; do not claim universal form recognition.

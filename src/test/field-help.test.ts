@@ -176,3 +176,24 @@ it("uses Gemini with header authentication and reports model failures honestly",
     await (await handler(req({ fieldId: "other-income", mode: "explain" }))).json(),
   ).toMatchObject({ isAI: false, status: "model-unavailable" });
 });
+
+it.each([
+  ["w9-classification", "https://www.irs.gov/pub/irs-pdf/fw9.pdf", "W-9"],
+  ["ds11-signature", "https://eforms.state.gov/Forms/ds11_pdf.PDF", "DS-11"],
+])("grounds %s in its own form and official source", async (fieldId, source, form) => {
+  const fetcher = vi
+    .fn()
+    .mockResolvedValue(
+      Response.json({
+        done: true,
+        response: "Review the official instructions for this field before completing the form.",
+      }),
+    );
+  const handler = createFieldHelpHandler(fetcher);
+  const result = await (await handler(req({ fieldId, mode: "explain" }))).json();
+  expect(result).toMatchObject({ isAI: true, fieldId, source: { url: source } });
+  expect(JSON.parse(fetcher.mock.calls[0]![1].body).prompt).toContain(form);
+  expect(JSON.parse(fetcher.mock.calls[0]![1].body).prompt).not.toContain(
+    "income without withholding",
+  );
+});

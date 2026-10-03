@@ -1,0 +1,107 @@
+[
+  {
+    "id": "w4",
+    "name": "W-4",
+    "title": "Starting a job",
+    "description": "Understand paycheck withholding.",
+    "source": {
+      "title": "IRS Form W-4 · 2026 instructions",
+      "url": "https://www.irs.gov/pub/irs-pdf/fw4.pdf",
+      "reviewedAt": "2026-10-03",
+      "reviewMethod": "assistant-source-review"
+    },
+    "fields": [
+      {
+        "id": "multiple-jobs",
+        "label": "Multiple jobs or spouse works",
+        "step": "W-4 · Step 2",
+        "evidence": "Step 2 addresses simultaneous jobs or joint filers whose spouse works. IRS offers an estimator, a worksheet, and a two-job checkbox option with conditions. Review the official instructions before selecting an option.",
+        "find": "Have current pay stubs available for the IRS withholding estimator. Review Step 2 in the official W-4 instructions."
+      },
+      {
+        "id": "other-income",
+        "label": "Other income (not from jobs)",
+        "step": "W-4 · Step 4(a)",
+        "evidence": "This optional adjustment concerns estimated annual income without withholding, such as interest, dividends or retirement income. Job and self-employment income do not belong in Step 4(a). Follow the instructions for your situation.",
+        "find": "Review records of interest, dividends or retirement income and the official Step 4(a) instructions. Do not include pay from jobs or self-employment here."
+      },
+      {
+        "id": "extra-withholding",
+        "label": "Extra withholding",
+        "step": "W-4 · Step 4(c)",
+        "evidence": "Step 4(c) is an additional amount of federal tax withheld each pay period. It is not an annual figure. The Multiple Jobs Worksheet can produce an amount for this field. ClearStep cannot choose an amount for you.",
+        "find": "Check the official Step 4(c) instructions and, if applicable, the Multiple Jobs Worksheet. Use the IRS estimator for your own situation."
+      }
+    ]
+  },
+  {
+    "id": "w9",
+    "name": "W-9",
+    "title": "Contractor paperwork",
+    "description": "Understand a request for taxpayer information.",
+    "source": {
+      "title": "IRS Form W-9 · March 2024 instructions",
+      "url": "https://www.irs.gov/pub/irs-pdf/fw9.pdf",
+      "reviewedAt": "2026-10-03",
+      "reviewMethod": "assistant-source-review"
+    },
+    "fields": [
+      {
+        "id": "w9-business-name",
+        "label": "Business name, if different",
+        "step": "W-9 · Line 2",
+        "evidence": "Line 2 is for a business or disregarded entity name different from line 1. A sole proprietor puts the owner’s name on line 1. W-9 is for U.S. persons, including resident aliens; others should review the official alternatives.",
+        "find": "Compare lines 1 and 2 with the specific instructions in the official W-9."
+      },
+      {
+        "id": "w9-classification",
+        "label": "Federal tax classification",
+        "step": "W-9 · Line 3a",
+        "evidence": "Line 3a asks for the federal tax classification of the person or entity on line 1. Check one box. An LLC treated as a disregarded entity uses its owner’s classification. ClearStep cannot determine your classification.",
+        "find": "Review the line 3a instructions and your business tax records; ask a qualified tax professional if unsure."
+      },
+      {
+        "id": "w9-exemptions",
+        "label": "Exemptions",
+        "step": "W-9 · Line 4",
+        "evidence": "Exemption codes apply to certain entities, not individuals. FATCA exemption codes concern accounts outside the United States. Do not assume an exemption applies.",
+        "find": "Read the Exemptions section of the W-9 instructions before entering a code."
+      }
+    ]
+  },
+  {
+    "id": "ds11",
+    "name": "DS-11",
+    "title": "Applying for a passport",
+    "description": "Understand key parts of an in-person application.",
+    "source": {
+      "title": "U.S. Department of State · DS-11 instructions",
+      "url": "https://eforms.state.gov/Forms/ds11_pdf.PDF",
+      "reviewedAt": "2026-10-03",
+      "reviewMethod": "assistant-source-review"
+    },
+    "fields": [
+      {
+        "id": "ds11-document",
+        "label": "Passport book or passport card",
+        "step": "DS-11 · Document choice",
+        "evidence": "A passport book supports international travel by air, land and sea. A passport card is not valid for international air travel. Its use is limited to land crossings and seaports when arriving from Canada, Mexico, Bermuda and the Caribbean.",
+        "find": "Read Section F of the DS-11 instructions before choosing a document."
+      },
+      {
+        "id": "ds11-care-of",
+        "label": "Mailing address: In Care Of",
+        "step": "DS-11 · Item 8",
+        "evidence": "If you do not live at the mailing address, line 2 identifies the person living there, marked In Care Of. For a minor, include the parent or adult registered to receive mail there.",
+        "find": "See Item 8 in Section C of the official DS-11 instructions."
+      },
+      {
+        "id": "ds11-signature",
+        "label": "Applicant signature",
+        "step": "DS-11 · Signature section",
+        "evidence": "Do not sign DS-11 until an authorized agent asks you to. The agent administers the oath and witnesses your signature at the appointment. ClearStep cannot accept a signature or submit an application.",
+        "find": "Read Section B and the signature note in Section C before your appointment."
+      }
+    ]
+  }
+]

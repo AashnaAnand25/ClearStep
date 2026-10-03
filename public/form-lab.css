@@ -326,3 +326,51 @@ body.extension-mode aside {
     transition: none !important;
   }
 }
+
+.form-chooser {
+  margin: 0 0 2rem;
+}
+.form-chooser h2 {
+  margin-bottom: 0.5rem;
+}
+.form-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+.form-options button {
+  text-align: left;
+  background: #fff;
+  border: 1px solid #b5c5bc;
+  border-radius: 14px;
+  padding: 20px;
+  color: #173d32;
+  cursor: pointer;
+}
+.form-options button[aria-pressed="true"] {
+  background: #e5f2e8;
+  border: 2px solid #256448;
+  padding: 19px;
+}
+.form-options strong,
+.form-options span {
+  display: block;
+}
+.form-options strong {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+.form-options span {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.form-options button:focus-visible {
+  outline: 3px solid #256448;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .form-options {
+    grid-template-columns: 1fr;
+  }
+}

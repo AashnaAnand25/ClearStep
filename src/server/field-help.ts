@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { FORM_FIELDS, FORM_SOURCE } from "@/data/form-fields";
+import { FORM_FIELDS } from "@/data/form-fields";
 const inputSchema = z
   .object({
-    fieldId: z.enum(["multiple-jobs", "other-income", "extra-withholding"]),
+    fieldId: z.string().refine((id) => Object.hasOwn(FORM_FIELDS, id)),
     mode: z.enum(["explain", "simpler", "find"]).default("explain"),
   })
   .strict();
@@ -84,12 +84,12 @@ export function createFieldHelpHandler(
     const input = inputSchema.safeParse(raw);
     if (!input.success) return reply({ error: "This field is not supported yet." }, 400);
     const { fieldId, mode } = input.data;
-    const field = FORM_FIELDS[fieldId];
+    const field = FORM_FIELDS[fieldId]!;
     const base = {
       fieldId,
       label: field.label,
       step: field.step,
-      source: FORM_SOURCE,
+      source: field.source,
       find: field.find,
     };
     const fallback = (reason: string) =>
@@ -116,14 +116,17 @@ export function createFieldHelpHandler(
     busy = true;
     try {
       const system =
-        "You explain W-4 labels to a first-time reader. Use only the supplied evidence. Explain, never fill in the form or choose a tax amount. Do not infer personal circumstances, eligibility, or recommend checking a box. Preserve all conditions in the evidence. Do not import facts from other fields. No made-up examples, amounts, deadlines, links, or additional tax facts. Return JSON with one explanation string, 2-3 brief sentences, no Markdown. If unsure, direct the reader to the official instructions.";
+        "You explain government form labels to a first-time reader. Use only the supplied evidence. Explain, never fill in the form or choose an answer. Do not infer personal circumstances, eligibility, or recommend checking a box. Preserve all conditions in the evidence. Do not import facts from other fields. No made-up examples, amounts, deadlines, links, or additional facts. Return JSON with one explanation string, 2-3 brief sentences, no Markdown. If unsure, direct the reader to the official instructions.";
       const prompt = JSON.stringify({
         criticalRule:
           fieldId === "multiple-jobs"
             ? "If you mention a spouse, also say married filing jointly. More than one job means jobs held at the same time."
             : fieldId === "extra-withholding"
               ? "Say extra tax is taken out of each paycheck. You may clarify that it is not extra money added to pay."
-              : "This covers income without withholding, not job or self-employment income.",
+              : fieldId === "other-income"
+                ? "This covers income without withholding, not job or self-employment income."
+                : "Preserve the conditions in this field’s evidence. Do not decide the user’s answer.",
+        form: field.formName,
         field: field.label,
         evidence: field.evidence,
         find: field.find,
