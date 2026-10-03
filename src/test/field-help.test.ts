@@ -154,3 +154,25 @@ describe("extension field detection privacy", () => {
     expect(detect(document.getElementById("password")!)).toBeNull();
   });
 });
+
+it("uses Gemini with header authentication and reports model failures honestly", async () => {
+  const fetcher = vi
+    .fn()
+    .mockResolvedValueOnce(
+      Response.json({
+        candidates: [{ content: { parts: [{ text: JSON.stringify({ explanation: content }) }] } }],
+      }),
+    )
+    .mockResolvedValueOnce(new Response("", { status: 404 }));
+  const handler = createFieldHelpHandler(fetcher, { provider: "gemini", apiKey: "test-secret" });
+  expect(await (await handler(req())).json()).toMatchObject({
+    isAI: true,
+    provider: "gemini",
+    model: "gemini-3.5-flash-lite",
+  });
+  expect(fetcher.mock.calls[0]![0]).not.toContain("test-secret");
+  expect(fetcher.mock.calls[0]![1].headers["x-goog-api-key"]).toBe("test-secret");
+  expect(
+    await (await handler(req({ fieldId: "other-income", mode: "explain" }))).json(),
+  ).toMatchObject({ isAI: false, status: "model-unavailable" });
+});

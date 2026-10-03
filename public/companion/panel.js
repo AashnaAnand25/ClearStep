@@ -10,6 +10,7 @@ let mode = "explain";
 let sequence = 0;
 async function selectField(id, error = "") {
   fieldId = Object.hasOwn(fields, id) ? id : null;
+  stopSpeaking();
   sequence++;
   $("field-label").textContent = fieldId ? fields[fieldId][0] : "Choose a supported field";
   $("field-step").textContent = fieldId
@@ -29,6 +30,8 @@ async function selectField(id, error = "") {
 }
 async function explain() {
   if (!fieldId) return;
+  stopSpeaking();
+  $("listen").hidden = true;
   const ticket = ++sequence;
   const selected = fieldId;
   $("answer-badge").textContent = "READING THE INSTRUCTIONS";
@@ -55,9 +58,12 @@ async function explain() {
     $("answer-badge").textContent = result.isAI
       ? result.provider === "openai"
         ? "AI EXPLANATION · OPENAI"
-        : "LOCAL AI · QWEN 2.5"
+        : result.provider === "gemini"
+          ? "AI EXPLANATION · GEMINI"
+          : "LOCAL AI · QWEN 2.5"
       : "REVIEWED GUIDE · AI UNAVAILABLE";
     $("answer-text").textContent = result.explanation;
+    $("listen").hidden = !("speechSynthesis" in window);
     $("source").hidden = false;
     $("retry").hidden = result.isAI;
     if (result.status === "busy") $("answer-badge").textContent = "REVIEWED GUIDE · AI IS BUSY";
@@ -65,7 +71,7 @@ async function explain() {
     if (ticket !== sequence) return;
     $("answer-badge").textContent = "LET’S RECONNECT";
     $("answer-text").textContent =
-      "Start the ClearStep server and Ollama on this computer, then try again. You can still read the official instructions below.";
+      "We couldn’t reach the explanation service. Please try again in a moment. You can still read the official instructions below.";
     $("source").hidden = false;
     $("retry").hidden = false;
   } finally {
@@ -107,3 +113,22 @@ if (extension) {
   });
   parent.postMessage({ type: "clearstep-ready" }, location.origin);
 }
+
+function stopSpeaking() {
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  $("listen").textContent = "Listen to this explanation";
+}
+$("listen").addEventListener("click", () => {
+  if (window.speechSynthesis.speaking) {
+    stopSpeaking();
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance($("answer-text").textContent);
+  utterance.lang = "en-US";
+  utterance.rate = 0.9;
+  utterance.onend = stopSpeaking;
+  utterance.onerror = stopSpeaking;
+  $("listen").textContent = "Stop reading";
+  window.speechSynthesis.speak(utterance);
+});
+window.addEventListener("pagehide", stopSpeaking);

@@ -27,12 +27,13 @@ export function createFieldHelpHandler(
     extensionIds?: string | undefined;
   } = {},
 ) {
-  const provider = config.provider === "openai" ? "openai" : config.provider === "gemini" ? "gemini" : "ollama";
+  const provider =
+    config.provider === "openai" ? "openai" : config.provider === "gemini" ? "gemini" : "ollama";
   const model =
     provider === "openai"
       ? config.model || "gpt-4o-mini"
       : provider === "gemini"
-        ? config.model || "gemini-2.0-flash-exp"
+        ? config.model || "gemini-3.5-flash-lite"
         : "qwen2.5:7b";
   const extensionIds = (config.extensionIds || "").split(",").filter(Boolean);
   let windowStart = 0;
@@ -110,7 +111,7 @@ export function createFieldHelpHandler(
       calls = 0;
     }
     if (calls >= 20) return fallback("busy");
-    if (provider === "openai" && !config.apiKey) return fallback("offline");
+    if (provider !== "ollama" && !config.apiKey) return fallback("offline");
     calls++;
     busy = true;
     try {
@@ -143,14 +144,16 @@ export function createFieldHelpHandler(
         provider === "openai"
           ? "https://api.openai.com/v1/responses"
           : provider === "gemini"
-            ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.apiKey}`
+            ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`
             : "http://127.0.0.1:11434/api/generate",
         {
           method: "POST",
           headers:
             provider === "openai"
               ? { "Content-Type": "application/json", Authorization: `Bearer ${config.apiKey}` }
-              : { "Content-Type": "application/json" },
+              : provider === "gemini"
+                ? { "Content-Type": "application/json", "x-goog-api-key": config.apiKey || "" }
+                : { "Content-Type": "application/json" },
           signal: AbortSignal.timeout(60000),
           body: JSON.stringify(
             provider === "openai"
@@ -187,7 +190,7 @@ export function createFieldHelpHandler(
                     ],
                     generationConfig: {
                       temperature: 0,
-                      maxOutputTokens: 400,
+                      maxOutputTokens: 1500,
                       responseMimeType: "application/json",
                     },
                   }
@@ -205,7 +208,16 @@ export function createFieldHelpHandler(
           ),
         },
       );
-      if (!response.ok) return fallback("offline");
+      if (!response.ok)
+        return fallback(
+          response.status === 429
+            ? "rate-limited"
+            : response.status === 404
+              ? "model-unavailable"
+              : response.status === 401 || response.status === 403
+                ? "configuration"
+                : "offline",
+        );
       const data = await response.json();
       let generated: string;
       if (provider === "openai") {
@@ -265,7 +277,8 @@ export function createFieldHelpHandler(
 }
 export const handleFieldHelp = createFieldHelpHandler(fetch, {
   provider: process.env["AI_PROVIDER"],
-  apiKey: process.env["GEMINI_API_KEY"] || process.env["OPENAI_API_KEY"],
-  model: process.env["GEMINI_MODEL"] || process.env["OPENAI_MODEL"],
+  apiKey:
+    process.env[process.env["AI_PROVIDER"] === "gemini" ? "GEMINI_API_KEY" : "OPENAI_API_KEY"],
+  model: process.env[process.env["AI_PROVIDER"] === "gemini" ? "GEMINI_MODEL" : "OPENAI_MODEL"],
   extensionIds: process.env["CLEARSTEP_EXTENSION_IDS"],
 });
