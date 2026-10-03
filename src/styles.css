@@ -118,6 +118,22 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  html.reduce-motion *,
+  html.reduce-motion *::before,
+  html.reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html.high-contrast {
+    --foreground: oklch(0.16 0.055 260);
+    --muted-foreground: oklch(0.3 0.035 260);
+    --border: oklch(0.72 0.012 85);
+    --border-strong: oklch(0.55 0.015 85);
+  }
 }
 
 @layer base {

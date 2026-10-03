@@ -25,7 +25,7 @@ function renderAt(path: string) {
 afterEach(() => {
   cleanup();
   localStorage.clear();
-  document.documentElement.classList.remove("text-large");
+  document.documentElement.classList.remove("text-large", "high-contrast", "reduce-motion");
   vi.restoreAllMocks();
 });
 
@@ -189,13 +189,19 @@ describe("ClearStep journeys", () => {
     expect(JSON.parse(localStorage.getItem("clearstep.plan.v1")!).intakeComplete).toBe(false);
   });
 
-  it("restores larger text and allows it to be switched off", async () => {
-    localStorage.setItem("clearstep.largeText", "1");
-    renderAt("/");
-    const toggle = await screen.findByRole("button", { name: "Larger text" });
-    await waitFor(() => expect(toggle).toHaveAttribute("aria-pressed", "true"));
+  it("restores accessibility preferences and updates the active setting", async () => {
+    localStorage.setItem(
+      "clearstep.accessibility",
+      JSON.stringify({ textSize: "large", highContrast: false, reducedMotion: false }),
+    );
+    renderAt("/settings");
+    expect(
+      await screen.findByRole("heading", { name: "Accessibility settings" }),
+    ).toBeInTheDocument();
     expect(document.documentElement).toHaveClass("text-large");
-    fireEvent.click(toggle);
-    expect(document.documentElement).not.toHaveClass("text-large");
+    fireEvent.click(screen.getByRole("tab", { name: "Contrast" }));
+    const contrast = screen.getByRole("checkbox", { name: "High contrast" });
+    fireEvent.click(contrast);
+    expect(document.documentElement).toHaveClass("high-contrast");
   });
 });
