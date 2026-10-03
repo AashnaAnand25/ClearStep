@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ClearStep — Try the form companion</title>
+    <link rel="stylesheet" href="/form-lab.css" />
+  </head>
+  <body>
+    <header>
+      <a href="/" class="brand"><span>↗</span> ClearStep.</a>
+      <div class="header-right">
+        <span class="tag">INTERACTIVE PRACTICE</span
+        ><a href="/companion/manifest.json" id="extension-link">Extension setup ↗</a>
+      </div>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">LESS “WHAT DOES THAT MEAN?”</p>
+        <h1>The form stays.<br /><em>The confusion doesn’t have to.</em></h1>
+        <p>
+          A companion for the moment you get stuck. Select a field and turn unfamiliar language into
+          a clear next step.
+        </p>
+      </section>
+      <div class="workspace">
+        <section class="form-shell">
+          <div class="form-top">
+            <div>
+              <span class="eyebrow">YOUR FIRST PAYCHECK STARTS HERE</span>
+              <h2>Let’s unpack a W-4.</h2>
+            </div>
+            <span class="paper-icon" aria-hidden="true">▤</span>
+          </div>
+          <p class="practice-note">
+            <strong>Practice only.</strong> These are three excerpts adapted from the 2026 W-4—not a
+            complete or official form. Use fictional answers. Nothing is saved or submitted.
+          </p>
+          <div class="steps">
+            <span>01 <b>Choose a field</b></span
+            ><span>02 <b>Understand it</b></span
+            ><span>03 <b>Check the source</b></span>
+          </div>
+          <form autocomplete="off" onsubmit="return false;">
+            <div class="field-card" data-field="multiple-jobs">
+              <div class="field-meta">
+                <span>STEP 2</span
+                ><button type="button" data-help="multiple-jobs">✦ Explain this field</button>
+              </div>
+              <label for="multiple-jobs">Multiple jobs or spouse works</label>
+              <p>Not sure what this section is asking? That’s exactly where ClearStep helps.</p>
+              <select id="multiple-jobs">
+                <option value="">Select a practice response</option>
+                <option>I need to review the instructions</option>
+                <option>I understand what this section asks</option>
+              </select>
+            </div>
+            <div class="field-card" data-field="other-income">
+              <div class="field-meta">
+                <span>STEP 4(a)</span
+                ><button type="button" data-help="other-income">✦ Explain this field</button>
+              </div>
+              <label for="other-income">Other income (not from jobs)</label>
+              <p>
+                Try selecting this field before you type. The companion never reads your answer.
+              </p>
+              <div class="money">
+                <span aria-hidden="true">$</span
+                ><input
+                  id="other-income"
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="Fictional amount only"
+                />
+              </div>
+            </div>
+            <div class="field-card" data-field="extra-withholding">
+              <div class="field-meta">
+                <span>STEP 4(c)</span
+                ><button type="button" data-help="extra-withholding">✦ Explain this field</button>
+              </div>
+              <label for="extra-withholding">Extra withholding</label>
+              <p>One unfamiliar phrase shouldn’t stop the whole process.</p>
+              <div class="money">
+                <span aria-hidden="true">$</span
+                ><input
+                  id="extra-withholding"
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="Fictional amount only"
+                />
+              </div>
+            </div>
+          </form>
+          <div class="form-bottom">
+            <span>◈ No answers collected. No form submitted.</span
+            ><a
+              href="https://www.irs.gov/forms-pubs/about-form-w-4"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Get the official W-4 ↗</a
+            >
+          </div>
+        </section>
+        <aside id="companion-shell">
+          <iframe
+            id="companion"
+            src="/companion/panel.html"
+            title="ClearStep AI form companion"
+          ></iframe>
+        </aside>
+      </div>
+      <section class="extension-note">
+        <div>
+          <h2>Bring the companion alongside an HTML form.</h2>
+          <p>
+            The Chrome extension recognizes these same three field labels after you click its icon.
+            Browser PDF viewers and unrecognized fields are not supported.
+          </p>
+        </div>
+        <button id="extension-mode">Use installed extension instead</button>
+      </section>
+      <dialog id="setup">
+        <h2>Load the Chrome extension</h2>
+        <ol>
+          <li>Open <strong>chrome://extensions</strong> in Chrome.</li>
+          <li>Enable Developer mode, then choose <strong>Load unpacked</strong>.</li>
+          <li>Select the project’s <strong>public/companion</strong> folder.</li>
+          <li>Keep ClearStep running at <strong>127.0.0.1:3000</strong> and Ollama running.</li>
+          <li>Open this practice page in Chrome, click the extension icon, then focus a field.</li>
+        </ol>
+        <p>
+          The extension requests temporary access when you click it. It sends only a known field
+          ID—not form answers—to the local service.
+        </p>
+        <button id="close-setup">Got it</button>
+      </dialog>
+    </main>
+    <script src="/form-lab.js"></script>
+  </body>
+</html>

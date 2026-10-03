@@ -1,0 +1,215 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #f7f8f4;
+  color: #182d30;
+  font:
+    16px/1.55 system-ui,
+    -apple-system,
+    sans-serif;
+}
+header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 22px;
+  border-bottom: 1px solid #dce3dc;
+  background: #fff;
+}
+header strong {
+  font-size: 23px;
+  letter-spacing: -1px;
+}
+.mark {
+  display: grid;
+  place-items: center;
+  background: #155c50;
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 26px;
+}
+.dot {
+  color: #167260;
+}
+.pill {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #47615c;
+}
+main {
+  padding: 24px;
+}
+.connection {
+  font-size: 11px;
+  color: #4d635e;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.connection span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #168473;
+}
+h1 {
+  font-size: 29px;
+  line-height: 1.16;
+  letter-spacing: -1px;
+  margin: 18px 0 12px;
+}
+.intro {
+  font-size: 14px;
+  color: #5c6c68;
+  margin-bottom: 24px;
+}
+.selected {
+  border: 1px solid #d3dfd4;
+  border-left: 3px solid #367a5b;
+  border-radius: 12px;
+  padding: 18px;
+  background: #edf3e9;
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  font-weight: 800;
+  color: #507453;
+}
+h2 {
+  font-size: 19px;
+  line-height: 1.3;
+  margin: 8px 0;
+}
+.selected p {
+  font-size: 12px;
+  margin: 0;
+  color: #637367;
+}
+.modes {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  background: #e9ede7;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+button {
+  cursor: pointer;
+  font: inherit;
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: transparent;
+  color: #34554c;
+  font-size: 12px;
+  font-weight: 700;
+  flex: 1;
+}
+.modes button[aria-pressed="true"] {
+  background: #fff;
+  box-shadow: 0 2px 5px #1c352312;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #198d70;
+  outline-offset: 3px;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.answer {
+  background: white;
+  border: 1px solid #dfe5da;
+  border-radius: 14px;
+  padding: 22px;
+  min-height: 170px;
+  box-shadow: 0 8px 26px #253f2510;
+}
+.answer p {
+  font-size: 17px;
+  line-height: 1.7;
+  margin: 12px 0 0;
+}
+.answer[aria-busy="true"] {
+  border-color: #99b7a6;
+}
+.answer[aria-busy="true"] p {
+  color: #657b70;
+}
+#retry {
+  margin-top: 12px;
+  background: #e7efe7;
+}
+#source {
+  margin-top: 22px;
+}
+#source a {
+  display: flex;
+  justify-content: space-between;
+  color: #155c50;
+  font-size: 14px;
+  font-weight: 750;
+  padding: 12px 0;
+}
+#source p {
+  font-size: 11px;
+  color: #66776c;
+  margin: 0;
+}
+footer {
+  display: flex;
+  gap: 12px;
+  border-top: 1px solid #dce3dc;
+  margin-top: 28px;
+  padding-top: 18px;
+  color: #6b7870;
+}
+footer > span {
+  font-size: 22px;
+}
+footer p {
+  font-size: 11px;
+  margin: 0;
+}
+footer strong {
+  color: #3b5549;
+}
+[hidden] {
+  display: none !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .answer {
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+}
+@media (max-width: 340px) {
+  main {
+    padding: 16px;
+  }
+  .pill {
+    display: none;
+  }
+  .modes button {
+    padding: 6px;
+    font-size: 11px;
+  }
+}
+
+.settings-link {
+  display: block;
+  text-align: right;
+  padding: 8px 22px 0;
+  font-size: 11px;
+  color: #47615c;
+}

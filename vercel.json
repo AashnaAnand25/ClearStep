@@ -1,0 +1,7 @@
+{
+  "buildCommand": "bun run build",
+  "outputDirectory": ".output",
+  "devCommand": "bun run dev",
+  "installCommand": "bun install --frozen-lockfile",
+  "framework": null
+}

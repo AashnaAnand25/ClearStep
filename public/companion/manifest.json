@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "ClearStep \u2014 Form Companion",
+  "version": "1.0.0",
+  "description": "Local AI explanations for three W-4 fields. Reads supported labels, never your typed answers.",
+  "permissions": ["activeTab", "scripting", "sidePanel", "storage"],
+  "host_permissions": ["http://127.0.0.1:3000/*"],
+  "action": {
+    "default_title": "Open ClearStep form help"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "panel.html"
+  },
+  "optional_host_permissions": ["https://*/*"],
+  "options_page": "options.html"
+}

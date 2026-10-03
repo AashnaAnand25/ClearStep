@@ -9,3 +9,4 @@ Keep the app focused on one tax-help preparation journey. Preserve accessible co
 - Keep fixture explanations visibly labeled. Do not imply filing or eligibility verification.
 - Run `bun run typecheck`, `bun run test`, `bun run lint`, and `bun run build` before handoff.
 - Preserve published Git history. Do not commit or push unless requested.
+- For deployment: Use `vercel.json` configuration. Set `OPENAI_API_KEY` and `OPENAI_MODEL` as environment variables in Vercel. See `DEPLOYMENT.md` for details.

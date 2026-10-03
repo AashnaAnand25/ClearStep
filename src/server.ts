@@ -1,3 +1,5 @@
+import "dotenv/config";
+import { handleFieldHelp } from "./server/field-help";
 import { handleExplanation } from "./server/explanations";
 import "./lib/error-capture";
 
@@ -48,6 +50,8 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      if (new URL(request.url).pathname === "/api/field-help")
+        return await handleFieldHelp(request);
       if (new URL(request.url).pathname === "/api/explanations")
         return await handleExplanation(request);
       const handler = await getServerEntry();

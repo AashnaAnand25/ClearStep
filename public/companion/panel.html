@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ClearStep Form Companion</title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <header>
+      <span class="mark">↗</span><strong>ClearStep<span class="dot">.</span></strong
+      ><span class="pill">FORM COMPANION</span>
+    </header>
+    <a class="settings-link" href="options.html" target="_blank" rel="noopener"
+      >Connection settings ↗</a
+    >
+    <main>
+      <div class="connection"><span></span> Help without leaving the form</div>
+      <h1>A little clarity.<br />Right where you need it.</h1>
+      <p class="intro">
+        Select a supported W-4 field. We’ll help you understand it, without reading your answer.
+      </p>
+      <section class="selected">
+        <span class="eyebrow">YOU’RE LOOKING AT</span>
+        <h2 id="field-label">Choose a field on the form</h2>
+        <p id="field-step">Supports Step 2, Step 4(a), and Step 4(c).</p>
+      </section>
+      <div class="modes" aria-label="Choose an explanation style">
+        <button data-mode="explain" aria-pressed="true">Explain it</button
+        ><button data-mode="simpler" aria-pressed="false">Even simpler</button
+        ><button data-mode="find" aria-pressed="false">Where to look</button>
+      </div>
+      <section class="answer" aria-live="polite" aria-busy="false">
+        <span id="answer-badge" class="eyebrow">LET’S TAKE IT ONE FIELD AT A TIME</span>
+        <p id="answer-text">
+          Click a field or use Tab to move through the form. Your explanation will appear here.
+        </p>
+        <button id="retry" hidden>Try again</button>
+      </section>
+      <div id="source" hidden>
+        <a href="https://www.irs.gov/pub/irs-pdf/fw4.pdf" target="_blank" rel="noopener noreferrer"
+          >IRS W-4 instructions <span aria-hidden="true">↗</span></a
+        >
+        <p>2026 form · source reviewed Oct 3, 2026</p>
+      </div>
+      <footer>
+        <span aria-hidden="true">◈</span>
+        <p>
+          <strong>Your answers stay yours.</strong><br />Only a supported field ID is sent to your
+          configured service. AI can make mistakes. Check the official instructions; ClearStep
+          cannot choose tax answers.
+        </p>
+      </footer>
+    </main>
+    <script src="panel.js"></script>
+  </body>
+</html>

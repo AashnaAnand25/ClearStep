@@ -66,3 +66,7 @@ Integrated into `main` after review. The existing controls and shared layout are
 Added allowlisted version-1 storage helpers in `src/lib/plan-persistence.ts`, integrated into the provider, and validated all-day calendar export with date-boundary, escaping and UTF-8 folding coverage. All 45 tests and typechecking pass; lint has no errors (8 existing warnings); production build passes. Stable checklist IDs follow Person 2's completed handoff. No participant sessions, real calendar-app import, final recording, or direct Person 1 receipt are claimed. Those require participants and final recording/submission coordination.
 
 Integration review: the reminder control now validates dates before export, explains invalid input, and states that calendar import is required. A route regression test covers invalid-to-valid recovery. Person 3 can pull `main` and start from the explanation contract above.
+
+## Form companion: new demo focus
+
+The home page now links to `/form-lab.html`. This is a clearly labelled practice W-4, with Explain it / Even simpler / Where to look. Its companion uses local Ollama without paid credit by default. Typed values are excluded; the server accepts only a known field ID and mode. The Chrome package uses the same panel with a background request bridge. See `docs/FORM_COMPANION.md` for load-unpacked steps and `AI_PROVIDER=openai` deployment. Do not claim arbitrary form support or PDF support; only three W-4 labels are recognized.

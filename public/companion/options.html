@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ClearStep connection</title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Choose where AI runs.</h1>
+      <p>
+        Local: keep ClearStep and Ollama running on your laptop. Hosted: enter your deployed
+        ClearStep HTTPS address. Hosted OpenAI needs usable API credit.
+      </p>
+      <label for="backend">ClearStep server address</label
+      ><input
+        id="backend"
+        value="http://127.0.0.1:3000"
+        style="width: 100%; padding: 14px; margin: 12px 0; font: inherit"
+      /><button id="save">Save connection</button>
+      <p id="status" role="status"></p>
+      <p>For a hosted server, allow this extension ID in <code>CLEARSTEP_EXTENSION_IDS</code>:</p>
+      <code id="id"></code>
+      <p>No API keys belong here. Keep keys on the server.</p>
+      <a href="panel.html">Back to companion</a>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>

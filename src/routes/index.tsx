@@ -50,6 +50,15 @@ function StartPage() {
             You don’t need to know all the answers. Find the official starting point, understand
             what you need, and keep your place.
           </p>
+          <a
+            href="/form-lab.html"
+            className="mt-7 inline-flex min-h-12 items-center gap-3 rounded-xl bg-primary px-6 py-3 font-bold text-primary-foreground shadow-sm"
+          >
+            Try the AI form companion <ArrowRight aria-hidden="true" />
+          </a>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A practice W-4. Select a field and get help right beside it.
+          </p>
           <div className="mt-8 flex items-center gap-2 text-base text-muted-foreground">
             <LockKeyhole className="size-4 shrink-0" aria-hidden="true" />
             No account. No sensitive details.

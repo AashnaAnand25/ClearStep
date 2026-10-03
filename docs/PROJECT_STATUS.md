@@ -10,7 +10,7 @@
 
 ## Verification on October 3, 2026
 
-64 automated tests pass. Typecheck and production build pass. Lint reports zero errors and eight existing Fast Refresh warnings. Browser walkthrough verified intake, online checklist, explanation loading and the labelled fallback with two official source links. Build inspection found neither the API key nor the upstream API implementation URL in browser assets.
+78 automated tests pass. Typecheck and production build pass. Lint reports zero errors and eight existing Fast Refresh warnings. Browser walkthrough verified intake, online checklist, explanation loading and the labelled fallback with two official source links. Build inspection found neither the API key nor the upstream API implementation URL in browser assets.
 
 Automated tests cover model success with controlled responses and failure paths, not model factual accuracy. The live supplied API key was read from ignored `.env`; the upstream API returned HTTP 429 with `credit_balance_exhausted`. The actual production endpoint returned the correct labelled fallback. A funded key and a successful live model test are still required before claiming live AI works with this account.
 
@@ -25,3 +25,7 @@ No API key is committed. Never include `.env` in screenshots, recordings, messag
 - Confirm Littlebird award eligibility/form requirements with organizers.
 
 The repository is a runnable prototype, not a deployed or submitted entry. No filing, eligibility decisions, verified official deadlines, tax-document uploads, or notification delivery are provided.
+
+## Form companion update
+
+The new `/form-lab.html` experience adds a three-field W-4 practice form and a shared AI side panel. `public/companion` packages the Chrome extension; `POST /api/field-help` supports local Ollama by default and hosted OpenAI when explicitly configured. Local model installation is independent of OpenAI billing. Read `docs/FORM_COMPANION.md` before the updated demo or deployment. The original checklist remains available from the home page.
