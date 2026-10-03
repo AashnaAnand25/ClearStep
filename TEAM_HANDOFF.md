@@ -71,6 +71,8 @@ No login, uploads, eligibility calculations, live crawling, or extra government 
 
 ## Person 4 implementation handoff — October 3, 2026
 
-Work is on `feature/progress-reminders`. The existing controls and shared layout are preserved. See [the early state/persistence contract](docs/PERSON4_HANDOFF.md) and [actual test findings, usability protocol, and demo script](docs/PERSON4_TESTING_AND_DEMO.md).
+Integrated into `main` after review. The existing controls and shared layout are preserved. See [the early state/persistence contract](docs/PERSON4_HANDOFF.md) and [actual test findings, usability protocol, and demo script](docs/PERSON4_TESTING_AND_DEMO.md).
 
 Added allowlisted version-1 storage helpers in `src/lib/plan-persistence.ts`, integrated into the provider, and validated all-day calendar export with date-boundary, escaping and UTF-8 folding coverage. All 45 tests and typechecking pass; lint has no errors (8 existing warnings); production build passes. Stable checklist IDs follow Person 2's completed handoff. No participant sessions, real calendar-app import, final recording, or direct Person 1 receipt are claimed. Those require participants and final recording/submission coordination.
+
+Integration review: the reminder control now validates dates before export, explains invalid input, and states that calendar import is required. A route regression test covers invalid-to-valid recovery. Person 3 can pull `main` and start from the explanation contract above.

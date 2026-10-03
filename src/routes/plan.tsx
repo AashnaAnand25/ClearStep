@@ -27,7 +27,7 @@ import { getChecklist, type ChecklistItemRecord } from "@/data/checklist";
 import { getJourneyRouting } from "@/data/routing";
 import { getSource } from "@/data/sources";
 import { getVerifiedDeadlines, type OfficialDeadline } from "@/data/dates";
-import { buildReminderIcs, downloadIcs } from "@/lib/calendar";
+import { buildReminderIcs, downloadIcs, isReminderDate } from "@/lib/calendar";
 import { ResourceCard } from "@/components/clearstep/ResourceCard";
 import { ChecklistItem } from "@/components/clearstep/ChecklistItem";
 import { ExplainPanel } from "@/components/clearstep/ExplainPanel";
@@ -346,6 +346,10 @@ function PlanPage() {
             <input
               id="reminder"
               type="date"
+              min="0001-01-01"
+              max="9999-12-30"
+              aria-invalid={!!plan.reminderDate && !isReminderDate(plan.reminderDate)}
+              aria-describedby="reminder-date-help"
               value={plan.reminderDate ?? ""}
               onChange={(e) => update((p) => ({ ...p, reminderDate: e.target.value || null }))}
               className="mt-1 min-h-12 max-w-full rounded-md border border-input bg-card px-3 text-base text-foreground"
@@ -353,9 +357,9 @@ function PlanPage() {
           </div>
           <Button
             variant="outline"
-            disabled={!plan.reminderDate}
+            disabled={!isReminderDate(plan.reminderDate)}
             onClick={() =>
-              plan.reminderDate &&
+              isReminderDate(plan.reminderDate) &&
               downloadIcs(
                 "clearstep-reminder.ics",
                 buildReminderIcs(
@@ -369,6 +373,11 @@ function PlanPage() {
             <CalendarPlus aria-hidden /> Add to calendar (.ics)
           </Button>
         </div>
+        <p id="reminder-date-help" className="mt-3 text-sm text-muted-foreground">
+          {plan.reminderDate && !isReminderDate(plan.reminderDate)
+            ? "Choose a valid date between January 1, 0001 and December 30, 9999."
+            : "Download and open the file in your calendar. ClearStep does not send notifications."}
+        </p>
         <div className="mt-5 border-t pt-4 text-base">
           {deadlines === null ? (
             <p className="text-muted-foreground">Checking for verified deadlines…</p>

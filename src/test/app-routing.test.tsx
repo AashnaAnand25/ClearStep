@@ -114,6 +114,28 @@ describe("ClearStep journeys", () => {
     expect(screen.getByLabelText("Reminder date")).toHaveValue("2026-10-20");
   });
 
+  it("blocks unsupported calendar dates and recovers after a valid selection", async () => {
+    localStorage.setItem(
+      "clearstep.plan.v1",
+      JSON.stringify({
+        ...initialPlan(),
+        intakeComplete: true,
+        answers: { help: "online", firstTime: "yes" },
+      }),
+    );
+    renderAt("/plan");
+    const date = await screen.findByLabelText("Reminder date");
+    const download = screen.getByRole("button", { name: /Add to calendar/ });
+    expect(download).toBeDisabled();
+    fireEvent.change(date, { target: { value: "9999-12-31" } });
+    expect(download).toBeDisabled();
+    expect(date).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByText(/Choose a valid date between/)).toBeInTheDocument();
+    fireEvent.change(date, { target: { value: "2028-02-29" } });
+    expect(download).toBeEnabled();
+    expect(date).toHaveAttribute("aria-invalid", "false");
+  });
+
   it("persists the date and unfinished action across a route remount", async () => {
     localStorage.setItem(
       "clearstep.plan.v1",
