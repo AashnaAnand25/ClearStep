@@ -18,6 +18,7 @@ export function ChecklistItem({ item, status, isNext, onStatus, onExplain }: Pro
   const expanded = open || status === "help";
   const panelId = useId();
   const source = getSource(item.sourceId);
+  const helpSource = getSource(item.helpAction.sourceId);
 
   return (
     <li
@@ -31,6 +32,9 @@ export function ChecklistItem({ item, status, isNext, onStatus, onExplain }: Pro
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h4 className="text-lg font-bold">{item.label}</h4>
+          {item.condition && (
+            <p className="mt-1 text-base text-muted-foreground">{item.condition}</p>
+          )}
           <p className="text-sm text-muted-foreground">
             {status === "skipped"
               ? "Does not apply"
@@ -90,6 +94,21 @@ export function ChecklistItem({ item, status, isNext, onStatus, onExplain }: Pro
       {expanded && (
         <div id={panelId} className="mt-2 rounded-md bg-muted p-4">
           <p>{item.why}</p>
+          {status === "help" && (
+            <div className="mt-3 border-t pt-3">
+              <p className="font-bold">What you can do next</p>
+              <p>{item.helpAction.text}</p>
+              <a
+                href={helpSource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center font-bold text-primary underline"
+              >
+                {item.helpAction.linkLabel}
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </div>
+          )}
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1">
             <button
               type="button"

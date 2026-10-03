@@ -2,25 +2,25 @@
 
 ## Frontend baseline (Person 1)
 
-The screens, logo, navigation, source cards, intake validation, explanation drawer, checklist controls, reminders, empty/error states, text-size toggle, and reset confirmation are integrated. Use this working baseline rather than regenerating the app. Content and explanations remain prototype fixtures so their owners can replace them deliberately.
+The screens, logo, navigation, source cards, intake validation, explanation drawer, checklist controls, reminders, empty/error states, text-size toggle, and reset confirmation are integrated. Use this working baseline rather than regenerating the app. Sources and checklist content are now reviewed for the defined scope; explanations remain labeled static samples for Person 3 to replace.
 
 Do not independently rename shared IDs, add extra journeys, or rebuild shared pages. Agree interface changes with Person 1 first. Integrate each feature early in a small commit.
 
-## Person 2: resources and routing
+## Person 2: complete — reviewed sources, routing, checklists
 
-Own:
+Completed on October 3, 2026. Six official IRS source pages were inspected and their canonical links checked. Review provenance is explicitly `assistant-source-review`; this is not a tax-professional audit. See [the source review](docs/SOURCE_REVIEW.md) for sources, ambiguities, and exclusions.
 
-- `src/data/sources.ts`: `SourceRecord`, `SOURCES`, `getSource(id)`.
-- `src/data/checklist.ts`: `ChecklistItemRecord`, `CHECKLIST`.
-- `src/data/dates.ts`: `getVerifiedDeadlines()`.
-- `startingSourceId()` in `src/lib/plan-logic.ts` (coordinate with Person 4, who owns the remaining progress rules).
+Files now ready:
 
-Source format: `id`, `title`, `url`, `domain`, `agency`, `supportingExcerpt` (a summary, not an exact quote), `reviewedAt` (null until reviewed). Checklist format: `id`, `label`, `why`, `sourceId`, optional `optional: true`.
+- `src/data/sources.ts`: six sources with review dates, summaries and section-level evidence; safe `findSource` and strict `getSource` lookups.
+- `src/data/routing.ts`: `getJourneyRouting(answers)` returns journey kind, source IDs, rationale, caveats, and checklist introduction. First-time status never determines eligibility.
+- `src/data/checklist.ts`: `getChecklist(answers)` returns five appointment items or four online items. `ALL_CHECKLIST_ITEMS` is the union for storage. `CHECKLIST` remains the default appointment list for compatibility, but must not drive active-plan progress.
+- `src/data/explanation-context.ts`: reviewed source context for Person 3.
+- `src/data/dates.ts`: intentionally no official deadlines without enough applicability information.
 
-Stable source IDs: `irs-free-prep`, `irs-checklist`, `irs-free-file`.
-Stable item IDs: `photo-id`, `ssn-cards`, `income-forms`, `last-return`, `bank-info`.
+Original IDs remain stable: `photo-id`, `ssn-cards`, `income-forms`, `last-return`, `bank-info`. Online-only IDs: `efile-identity`, `efile-signature`. Each item has `helpAction: { text, sourceId, linkLabel }` and conditional items have `optional` plus `condition`.
 
-Review all prototype wording against current sources, especially optional or conditional items. The current starter checklist is based on an in-person preparation source; determine how it should differ for an online-filing preference before claiming it is tailored. Do not treat this as a complete personal requirements list. Supply reviewed excerpts to Person 3. Keep dates empty unless applicable, verified, and linked to a source. Source links are manually curated; this is not a scam detector or an eligibility engine.
+Both routes are integrated into the page, progress calculations, and fallback explanations. Previously saved plans receive missing IDs as unfinished work. Person 2's implementation is ready; no backend or credentials are needed for it.
 
 ## Person 3: explanations
 
@@ -29,18 +29,22 @@ Own `src/lib/explanations.ts` and your new server-only endpoint. Coordinate pres
 Preserve the existing adapter:
 
 ```ts
-getExplanation(itemId: string): Promise<Explanation | null>
+getExplanation(itemId: string, answers?: IntakeAnswers): Promise<Explanation | null>
 // Explanation:
-// { itemId, isSample: boolean, plainLanguage, nextSteps: string[], sourceId }
+// { itemId, isSample: boolean, plainLanguage, nextSteps: string[], sourceId, sourceIds?: string[] }
 ```
 
-The panel already supports loading, failure, missing answers, sample/live labels, and official source links. Unknown source IDs are rejected by the panel. Return null for unsupported answers. If you need multiple source IDs, coordinate the small type/UI change first rather than silently breaking this interface. Resolve links using Person 2's source records, not model-generated URLs.
+The panel already supports loading, failure, missing answers, sample/live labels, and official source links. Unknown source IDs are rejected by the panel. Return null for unsupported answers. Multiple citations are already supported with optional `sourceIds`. Resolve links using Person 2's source records, not model-generated URLs.
+
+**Start here:** call `getExplanationContext(itemId, answers)` in your server endpoint to obtain the selected item and its reviewed source evidence. The page passes the intake answers to the adapter. Preserve those choices so online users receive online explanations. Validate inputs and restrict returned citations to the context's source IDs.
 
 Keep credentials on the server. No keys are needed to run the current fixtures. Leave `isSample: true` on fallback fixtures; set false only for actual supported service answers. Use only approved passages and test unsupported requests, invalid source IDs, and outages.
 
 ## Person 4: progress, reminders, usability, demo
 
 Own `src/lib/plan-store.tsx`, progress functions in `src/lib/plan-logic.ts`, `src/lib/calendar.ts`, and progress tests. Coordinate UI changes to `/plan` with Person 1.
+
+**Person 2 integration note:** progress must use `getChecklist(plan.answers)`, not the default `CHECKLIST`. Storage initializes all IDs, including online-only ones; inactive items must not block the current route. Missing required states and illegal skips are treated as unfinished work.
 
 The existing store exposes `plan`, `hydrated`, `welcomeBack`, `update`, `startFresh`, `loadSample`, `leaveSample`, `reset`, `largeText`, and `setLargeText`.
 

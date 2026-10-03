@@ -30,7 +30,8 @@ bun run start
 - Three screens: `/`, `/intake`, `/plan`.
 - Human-help and online-filing preferences lead to distinct IRS resources.
 - Explanations are labeled, prewritten fixtures. There is no live AI service yet.
-- Source review dates remain unset pending the content owner's review.
+- Six official IRS pages were reviewed by the assistant on October 3, 2026; provenance and limitations are in [docs/SOURCE_REVIEW.md](docs/SOURCE_REVIEW.md).
+- Appointment and online choices have distinct source-backed starter checklists.
 - No official deadline is supplied. Calendar exports are personal reminders.
 - Checklist completion means preparation, never submission or tax filing.
 - Progress is stored only in this browser. Sample mode does not overwrite a personal plan and is intentionally not persisted across reloads.

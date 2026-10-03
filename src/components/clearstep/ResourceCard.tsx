@@ -34,7 +34,7 @@ export function ResourceCard({ source, why }: { source: SourceRecord; why: strin
             <p className="mt-2 break-all text-sm">{source.url}</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {source.reviewedAt
-                ? `Reviewed ${source.reviewedAt}`
+                ? `Source checked ${source.reviewedAt} (assistant review)`
                 : "Not yet reviewed by ClearStep."}
             </p>
           </div>

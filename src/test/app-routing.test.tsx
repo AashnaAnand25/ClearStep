@@ -81,7 +81,9 @@ describe("ClearStep journeys", () => {
     const next = screen.getByRole("region", { name: "Your next step" });
     expect(next).toHaveTextContent("Get help with: Income forms");
     fireEvent.click(within(next).getByRole("button", { name: "Explain this" }));
-    expect(await screen.findByText(/A W-2 comes from an employer/)).toBeInTheDocument();
+    expect(
+      await within(screen.getByRole("dialog")).findByText(/A W-2 comes from an employer/),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     for (const group of screen.getAllByRole("group", { name: /^Status for/ }).slice(0, 3)) {
       fireEvent.click(within(group).getByRole("button", { name: "Ready" }));

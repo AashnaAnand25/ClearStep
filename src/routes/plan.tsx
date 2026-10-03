@@ -22,8 +22,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { usePlan, type ItemStatus } from "@/lib/plan-store";
-import { completedStages, getNextStep, prepDone, startingSourceId } from "@/lib/plan-logic";
-import { CHECKLIST, type ChecklistItemRecord } from "@/data/checklist";
+import { completedStages, getNextStep, prepDone } from "@/lib/plan-logic";
+import { getChecklist, type ChecklistItemRecord } from "@/data/checklist";
+import { getJourneyRouting } from "@/data/routing";
 import { getSource } from "@/data/sources";
 import { getVerifiedDeadlines, type OfficialDeadline } from "@/data/dates";
 import { buildReminderIcs, downloadIcs } from "@/lib/calendar";
@@ -103,14 +104,9 @@ function PlanPage() {
 
   const next = getNextStep(plan);
   const done = completedStages(plan);
-  const start = getSource(startingSourceId(plan.answers.help));
-  const firstTime = plan.answers.firstTime === "yes";
-  const whyStart =
-    plan.answers.help === "online"
-      ? "You said an online option would help. Free File is an IRS program offering free online software to people who meet its requirements. It's an option to explore."
-      : plan.answers.help === "person"
-        ? "You said you'd like someone to help. This IRS page describes free, in-person preparation by trained volunteers for people who qualify. It's an option to explore."
-        : "Not sure yet? This IRS page describes free help from trained volunteers, and is a good place to look around first. It's an option to explore.";
+  const routing = getJourneyRouting(plan.answers);
+  const checklist = getChecklist(plan.answers);
+  const start = getSource(routing.sourceId);
 
   const setStatus = (id: string, s: ItemStatus) =>
     update((p) => ({ ...p, checklist: { ...p.checklist, [id]: s } }));
@@ -121,7 +117,7 @@ function PlanPage() {
     { n: 3, title: "Continue with the provider", done: plan.stagesDone.provider },
   ];
 
-  const nextItem = next.kind === "item" ? CHECKLIST.find((i) => i.id === next.itemId)! : null;
+  const nextItem = next.kind === "item" ? checklist.find((i) => i.id === next.itemId)! : null;
 
   return (
     <div>
@@ -279,7 +275,8 @@ function PlanPage() {
       <h2 className="mt-12 text-2xl font-bold">Your plan, step by step</h2>
       <ol className="mt-7 space-y-10">
         <Stage n={1} title={stages[0]!.title} done={stages[0]!.done} current={next.stage === 1}>
-          <ResourceCard source={start} why={whyStart} />
+          <ResourceCard source={start} why={routing.why} />
+          <p className="mt-3 rounded-lg bg-muted p-4 text-base">{routing.beforeYouContinue}</p>
           {stages[0]!.done && (
             <UndoButton
               label="Mark step 1 as not done"
@@ -291,13 +288,9 @@ function PlanPage() {
         </Stage>
 
         <Stage n={2} title={stages[1]!.title} done={stages[1]!.done} current={next.stage === 2}>
-          <p className="text-muted-foreground">
-            This is a starter list to help you prepare, not a complete list for your situation.
-            {firstTime &&
-              " Since this may be your first time filing, it's fine if you don't have last year's return."}
-          </p>
+          <p className="text-muted-foreground">{routing.checklistIntro}</p>
           <ul className="mt-4 space-y-3">
-            {CHECKLIST.map((item) => (
+            {checklist.map((item) => (
               <ChecklistItem
                 key={item.id}
                 item={item}
@@ -310,8 +303,8 @@ function PlanPage() {
           </ul>
           <div className="mt-4">
             <ResourceCard
-              source={getSource("irs-checklist")}
-              why="The IRS list of what to bring to free tax preparation. Our starter list is based on it."
+              source={getSource(routing.checklistSourceId)}
+              why="Check this full IRS guide for additional records that may apply to your situation."
             />
           </div>
         </Stage>
@@ -428,7 +421,11 @@ function PlanPage() {
         </AlertDialog>
       </div>
 
-      <ExplainPanel item={explainItem} onClose={() => setExplainItem(null)} />
+      <ExplainPanel
+        item={explainItem}
+        answers={plan.answers}
+        onClose={() => setExplainItem(null)}
+      />
     </div>
   );
 }

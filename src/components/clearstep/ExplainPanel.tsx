@@ -8,14 +8,17 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { getExplanation, type Explanation } from "@/lib/explanations";
-import { getSource, SOURCES } from "@/data/sources";
+import { getSource, findSource } from "@/data/sources";
+import type { IntakeAnswers } from "@/data/routing";
 import type { ChecklistItemRecord } from "@/data/checklist";
 
 export function ExplainPanel({
   item,
+  answers,
   onClose,
 }: {
   item: ChecklistItemRecord | null;
+  answers?: IntakeAnswers;
   onClose: () => void;
 }) {
   const [state, setState] = useState<"loading" | "ready" | "unavailable">("loading");
@@ -26,24 +29,30 @@ export function ExplainPanel({
     let alive = true;
     setState("loading");
     setData(null);
-    getExplanation(item.id)
+    getExplanation(item.id, answers)
       .then((r) => {
         if (!alive) return;
         setData(r);
-        setState(r && SOURCES[r.sourceId] ? "ready" : "unavailable");
+        setState(
+          r &&
+            r.itemId === item.id &&
+            [r.sourceId, ...(r.sourceIds ?? [])].every((id) => findSource(id))
+            ? "ready"
+            : "unavailable",
+        );
       })
       .catch(() => alive && setState("unavailable"));
     return () => {
       alive = false;
     };
-  }, [item]);
+  }, [item, answers]);
 
-  const source =
-    state === "ready" && data && SOURCES[data.sourceId]
-      ? getSource(data.sourceId)
+  const sources =
+    state === "ready" && data
+      ? [...new Set([data.sourceId, ...(data.sourceIds ?? [])])].map(getSource)
       : item
-        ? getSource(item.sourceId)
-        : null;
+        ? [getSource(item.sourceId)]
+        : [];
 
   return (
     <Sheet open={!!item} onOpenChange={(o) => !o && onClose()}>
@@ -88,21 +97,25 @@ export function ExplainPanel({
               </section>
             </>
           )}
-          {source && state !== "loading" && (
+          {sources.length > 0 && state !== "loading" && (
             <section>
               <h3 className="text-lg font-bold">Where this comes from</h3>
-              <p className="mt-1">
-                {source.agency}: {source.title}
-              </p>
-              <a
-                href={source.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex min-h-12 items-center gap-2 font-bold text-primary underline"
-              >
-                Open {source.domain} <ExternalLink className="size-4" aria-hidden />
-                <span className="sr-only">(opens in a new tab)</span>
-              </a>
+              {sources.map((source) => (
+                <div key={source.id} className="mt-3">
+                  <p className="mt-1">
+                    {source.agency}: {source.title}
+                  </p>
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex min-h-12 items-center gap-2 font-bold text-primary underline"
+                  >
+                    Open {source.domain} <ExternalLink className="size-4" aria-hidden />
+                    <span className="sr-only">(opens in a new tab)</span>
+                  </a>
+                </div>
+              ))}
             </section>
           )}
         </div>

@@ -12,7 +12,11 @@ export interface OfficialDeadline {
   sourceId: string;
 }
 
-/** No verified deadlines are supplied for this prototype. A data service can fill this later. */
+/**
+ * Deliberately empty: intake does not establish tax year, jurisdiction, extension
+ * status, or relief eligibility. A generic April/October date could mislead users.
+ * Person 4 must preserve this distinction when extending reminder support.
+ */
 export async function getVerifiedDeadlines(): Promise<OfficialDeadline[]> {
   return [];
 }

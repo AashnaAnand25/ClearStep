@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { CHECKLIST } from "@/data/checklist";
+import { ALL_CHECKLIST_ITEMS } from "@/data/checklist";
 
 export type HelpChoice = "person" | "online" | "unsure";
 export type FirstTime = "yes" | "no" | "unsure";
@@ -27,7 +27,8 @@ export interface PlanState {
 const KEY = "clearstep.plan.v1";
 const TEXT_KEY = "clearstep.largeText";
 
-const emptyChecklist = () => Object.fromEntries(CHECKLIST.map((i) => [i.id, "todo" as ItemStatus]));
+const emptyChecklist = () =>
+  Object.fromEntries(ALL_CHECKLIST_ITEMS.map((i) => [i.id, "todo" as ItemStatus]));
 
 export const initialPlan = (): PlanState => ({
   version: 1,
