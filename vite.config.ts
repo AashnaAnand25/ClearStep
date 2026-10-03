@@ -10,7 +10,7 @@ export default defineConfig({
     tsConfigPaths(),
     tailwindcss(),
     tanstackStart({ server: { entry: "server" } }),
-    nitro({ preset: "node-server" }),
+    nitro(),
     react(),
   ],
   server: { host: "127.0.0.1", port: 3000 },
