@@ -8,7 +8,7 @@ function escapeIcs(text: string) {
 
 /** Builds an all-day .ics event for a personal reminder (YYYY-MM-DD). */
 export function buildReminderIcs(date: string, title: string, description: string): string {
-  const [y, m, d] = date.split("-").map(Number);
+  const [y = 1970, m = 1, d = 1] = date.split("-").map(Number);
   const start = `${y}${pad(m)}${pad(d)}`;
   const next = new Date(Date.UTC(y, m - 1, d + 1));
   const end = `${next.getUTCFullYear()}${pad(next.getUTCMonth() + 1)}${pad(next.getUTCDate())}`;
