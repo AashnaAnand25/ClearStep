@@ -57,7 +57,8 @@ function StartPage() {
             Try the AI form companion <ArrowRight aria-hidden="true" />
           </a>
           <p className="mt-2 text-sm text-muted-foreground">
-            A practice W-4. Select a field and get help right beside it.
+            Explore W-4, W-9, or passport application guidance. Choose a form, then select a field
+            for help right beside it.
           </p>
           <div className="mt-8 flex items-center gap-2 text-base text-muted-foreground">
             <LockKeyhole className="size-4 shrink-0" aria-hidden="true" />
