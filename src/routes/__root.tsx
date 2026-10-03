@@ -8,10 +8,9 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { PlanProvider } from "@/lib/plan-store";
 import { SiteFooter, SiteHeader } from "@/components/clearstep/SiteChrome";
 
@@ -20,7 +19,10 @@ function NotFoundComponent() {
     <div className="mx-auto max-w-[1080px] px-5 py-20">
       <h1 className="text-4xl font-bold">Page not found</h1>
       <p className="mt-3 text-muted-foreground">This page doesn't exist or has moved.</p>
-      <Link to="/" className="mt-6 inline-flex min-h-12 items-center rounded-md bg-primary px-5 font-bold text-primary-foreground">
+      <Link
+        to="/"
+        className="mt-6 inline-flex min-h-12 items-center rounded-md bg-primary px-5 font-bold text-primary-foreground"
+      >
         Go to start
       </Link>
     </div>
@@ -30,9 +32,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
   return (
     <div className="mx-auto max-w-[1080px] px-5 py-20">
       <h1 className="text-3xl font-bold">This page didn't load</h1>
@@ -68,7 +67,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap",
       },
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
   }),
   shellComponent: RootShell,

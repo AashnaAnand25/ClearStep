@@ -69,14 +69,22 @@
   --border-strong: oklch(0.8 0.015 85);
   --input: oklch(0.72 0.02 260);
   --ring: oklch(0.44 0.075 200);
-  --shadow-card: 0 1px 2px oklch(0.24 0.055 260 / 0.04), 0 4px 16px -8px oklch(0.24 0.055 260 / 0.08);
-  --shadow-focus-card: 0 2px 4px oklch(0.24 0.055 260 / 0.05), 0 16px 40px -20px oklch(0.24 0.055 260 / 0.18);
+  --shadow-card:
+    0 1px 2px oklch(0.24 0.055 260 / 0.04), 0 4px 16px -8px oklch(0.24 0.055 260 / 0.08);
+  --shadow-focus-card:
+    0 2px 4px oklch(0.24 0.055 260 / 0.05), 0 16px 40px -20px oklch(0.24 0.055 260 / 0.18);
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { font-size: 112.5%; }
-  html.text-large { font-size: 131.25%; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    font-size: 112.5%;
+  }
+  html.text-large {
+    font-size: 131.25%;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -84,20 +92,76 @@
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 { line-height: 1.2; letter-spacing: -0.01em; text-wrap: balance; }
+  h1,
+  h2,
+  h3 {
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
   :focus-visible {
     outline: 3px solid var(--color-ring);
     outline-offset: 3px;
     border-radius: 4px;
   }
-  a { text-underline-offset: 0.2em; }
+  a {
+    text-underline-offset: 0.2em;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  button:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  button,
+  a,
+  input {
+    touch-action: manipulation;
+  }
+  #main {
+    scroll-margin-top: 1rem;
+  }
+}
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.journey-card {
+  border-top: 4px solid var(--primary);
+}
+.home-enter {
+  animation: enter 0.35s ease-out both;
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-enter {
+    animation: none;
   }
 }

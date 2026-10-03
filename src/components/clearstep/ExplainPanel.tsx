@@ -1,11 +1,23 @@
 import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { getExplanation, type Explanation } from "@/lib/explanations";
-import { getSource } from "@/data/sources";
+import { getSource, SOURCES } from "@/data/sources";
 import type { ChecklistItemRecord } from "@/data/checklist";
 
-export function ExplainPanel({ item, onClose }: { item: ChecklistItemRecord | null; onClose: () => void }) {
+export function ExplainPanel({
+  item,
+  onClose,
+}: {
+  item: ChecklistItemRecord | null;
+  onClose: () => void;
+}) {
   const [state, setState] = useState<"loading" | "ready" | "unavailable">("loading");
   const [data, setData] = useState<Explanation | null>(null);
 
@@ -13,11 +25,12 @@ export function ExplainPanel({ item, onClose }: { item: ChecklistItemRecord | nu
     if (!item) return;
     let alive = true;
     setState("loading");
+    setData(null);
     getExplanation(item.id)
       .then((r) => {
         if (!alive) return;
         setData(r);
-        setState(r ? "ready" : "unavailable");
+        setState(r && SOURCES[r.sourceId] ? "ready" : "unavailable");
       })
       .catch(() => alive && setState("unavailable"));
     return () => {
@@ -25,23 +38,38 @@ export function ExplainPanel({ item, onClose }: { item: ChecklistItemRecord | nu
     };
   }, [item]);
 
-  const source = data ? getSource(data.sourceId) : item ? getSource(item.sourceId) : null;
+  const source =
+    state === "ready" && data && SOURCES[data.sourceId]
+      ? getSource(data.sourceId)
+      : item
+        ? getSource(item.sourceId)
+        : null;
 
   return (
     <Sheet open={!!item} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent side="right" className="w-full overflow-y-auto bg-card p-6 sm:max-w-lg [&>button]:size-12">
+      <SheetContent
+        side="right"
+        className="w-full max-w-full overflow-y-auto bg-card p-6 sm:max-w-lg [&>button]:size-12"
+      >
         <SheetHeader className="p-0 pr-12 text-left">
-          <p className="text-sm font-bold uppercase tracking-wide text-attention">Sample explanation</p>
+          <p className="text-sm font-bold uppercase tracking-wide text-attention">
+            {data && state === "ready" && !data.isSample
+              ? "Source-backed explanation"
+              : "Sample explanation"}
+          </p>
           <SheetTitle className="text-2xl font-bold text-foreground">{item?.label}</SheetTitle>
           <SheetDescription className="text-base text-muted-foreground">
-            Prewritten for this prototype. Not personalized advice.
+            {data && state === "ready" && !data.isSample
+              ? "Based on the source shown below. Not personalized advice."
+              : "Prewritten for this prototype. Not personalized advice."}
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-6" aria-live="polite">
           {state === "loading" && <p className="text-muted-foreground">Loading explanation…</p>}
           {state === "unavailable" && (
             <p className="rounded-md bg-attention-soft p-4">
-              An explanation isn't available for this item right now. You can still use the official source below.
+              An explanation isn't available for this item right now. You can still use the official
+              source below.
             </p>
           )}
           {state === "ready" && data && (

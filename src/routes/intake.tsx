@@ -8,9 +8,16 @@ export const Route = createFileRoute("/intake")({
   head: () => ({
     meta: [
       { title: "A few quick questions — ClearStep" },
-      { name: "description", content: "Two short questions to tailor your tax help starting point. No personal or financial details." },
+      {
+        name: "description",
+        content:
+          "Two short questions to tailor your tax help starting point. No personal or financial details.",
+      },
       { property: "og:title", content: "A few quick questions — ClearStep" },
-      { property: "og:description", content: "Two short questions to tailor your tax help starting point." },
+      {
+        property: "og:description",
+        content: "Two short questions to tailor your tax help starting point.",
+      },
     ],
   }),
   component: IntakePage,
@@ -38,7 +45,7 @@ const QUESTIONS = [
 ];
 
 function IntakePage() {
-  const { plan, update } = usePlan();
+  const { plan, update, hydrated } = usePlan();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [error, setError] = useState(false);
@@ -52,6 +59,8 @@ function IntakePage() {
     }
     headingRef.current?.focus();
   }, [step]);
+
+  if (!hydrated) return <p role="status">Getting your questions ready…</p>;
 
   const q = QUESTIONS[step]!;
   const value = plan.answers[q.key];
@@ -70,7 +79,15 @@ function IntakePage() {
   };
 
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto max-w-2xl">
+      <div className="mb-8 flex gap-2" aria-hidden="true">
+        {QUESTIONS.map((question, index) => (
+          <span
+            key={question.key}
+            className={`h-1.5 flex-1 rounded-full ${index <= step ? "bg-primary" : "bg-border"}`}
+          />
+        ))}
+      </div>
       <p className="text-base font-bold text-muted-foreground">
         Question {step + 1} of {QUESTIONS.length}
       </p>
@@ -120,18 +137,23 @@ function IntakePage() {
           </p>
         )}
         <p id="intake-note" className="mt-6 text-base text-muted-foreground">
-          Your answers only shape the explanations and suggested starting point. They don't decide what you owe or what you qualify for.
+          Your answers only shape the explanations and suggested starting point. They don't decide
+          what you owe or what you qualify for.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Button
             type="button"
             variant="outline"
-            onClick={() => (step === 0 ? navigate({ to: "/" }) : setStep(step - 1))}
+            onClick={() => {
+              setError(false);
+              if (step === 0) navigate({ to: "/" });
+              else setStep(step - 1);
+            }}
           >
             <ArrowLeft aria-hidden /> Back
           </Button>
           <Button type="submit">
-            Continue <ArrowRight aria-hidden />
+            {step === QUESTIONS.length - 1 ? "See my plan" : "Continue"} <ArrowRight aria-hidden />
           </Button>
         </div>
       </form>

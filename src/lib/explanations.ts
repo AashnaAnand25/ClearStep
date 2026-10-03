@@ -1,6 +1,6 @@
 export interface Explanation {
   itemId: string;
-  isSample: true;
+  isSample: boolean;
   plainLanguage: string;
   nextSteps: string[];
   sourceId: string;

@@ -3,6 +3,7 @@ export interface ChecklistItemRecord {
   label: string;
   why: string;
   sourceId: string;
+  optional?: boolean;
 }
 
 /** Starter preparation items, based on the IRS free preparation checklist. */
@@ -27,12 +28,14 @@ export const CHECKLIST: ChecklistItemRecord[] = [
   },
   {
     id: "last-return",
+    optional: true,
     label: "Last year's tax return, if you have it",
     why: "It can help a helper or software fill in details correctly. It's fine if you don't have one.",
     sourceId: "irs-checklist",
   },
   {
     id: "bank-info",
+    optional: true,
     label: "Bank account details for direct deposit",
     why: "If you're owed a refund, it can be sent straight to your bank account. This is optional.",
     sourceId: "irs-checklist",

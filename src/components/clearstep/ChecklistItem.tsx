@@ -32,7 +32,13 @@ export function ChecklistItem({ item, status, isNext, onStatus, onExplain }: Pro
         <div>
           <h4 className="text-lg font-bold">{item.label}</h4>
           <p className="text-sm text-muted-foreground">
-            {status === "ready" ? "Ready" : status === "help" ? "You asked for help" : "Not started"}
+            {status === "skipped"
+              ? "Does not apply"
+              : status === "ready"
+                ? "Ready"
+                : status === "help"
+                  ? "You asked for help"
+                  : "Not started"}
             {isNext && " · Your next step"}
           </p>
         </div>
@@ -55,6 +61,16 @@ export function ChecklistItem({ item, status, isNext, onStatus, onExplain }: Pro
           </button>
         </div>
       </div>
+      {item.optional && (
+        <button
+          type="button"
+          aria-pressed={status === "skipped"}
+          onClick={() => onStatus(status === "skipped" ? "todo" : "skipped")}
+          className="mt-2 inline-flex min-h-12 items-center rounded-md text-base font-bold text-primary underline"
+        >
+          {status === "skipped" ? "Include this item again" : "This doesn’t apply to me"}
+        </button>
+      )}
       <button
         type="button"
         aria-expanded={expanded}
@@ -64,7 +80,12 @@ export function ChecklistItem({ item, status, isNext, onStatus, onExplain }: Pro
         className="mt-2 inline-flex min-h-12 items-center gap-2 rounded-md font-bold text-primary underline disabled:no-underline disabled:opacity-100"
       >
         <CircleHelp className="size-5" aria-hidden /> Why do I need this?
-        {status !== "help" && <ChevronDown className={cn("size-5 transition-transform", expanded && "rotate-180")} aria-hidden />}
+        {status !== "help" && (
+          <ChevronDown
+            className={cn("size-5 transition-transform", expanded && "rotate-180")}
+            aria-hidden
+          />
+        )}
       </button>
       {expanded && (
         <div id={panelId} className="mt-2 rounded-md bg-muted p-4">

@@ -3,7 +3,11 @@ function pad(n: number) {
 }
 
 function escapeIcs(text: string) {
-  return text.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
 }
 
 /** Builds an all-day .ics event for a personal reminder (YYYY-MM-DD). */

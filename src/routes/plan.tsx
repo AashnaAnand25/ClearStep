@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { CalendarPlus, CheckCircle2, Circle, CircleDot, ExternalLink, Info, RotateCcw } from "lucide-react";
+import {
+  CalendarPlus,
+  CheckCircle2,
+  Circle,
+  CircleDot,
+  ExternalLink,
+  Info,
+  RotateCcw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -13,7 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { usePlan } from "@/lib/plan-store";
+import { usePlan, type ItemStatus } from "@/lib/plan-store";
 import { completedStages, getNextStep, prepDone, startingSourceId } from "@/lib/plan-logic";
 import { CHECKLIST, type ChecklistItemRecord } from "@/data/checklist";
 import { getSource } from "@/data/sources";
@@ -28,9 +36,15 @@ export const Route = createFileRoute("/plan")({
   head: () => ({
     meta: [
       { title: "My plan: Get ready for tax help — ClearStep" },
-      { name: "description", content: "Your next step, official starting points, and a starter preparation checklist." },
+      {
+        name: "description",
+        content: "Your next step, official starting points, and a starter preparation checklist.",
+      },
       { property: "og:title", content: "My plan — ClearStep" },
-      { property: "og:description", content: "Your next step and a starter checklist for getting tax help." },
+      {
+        property: "og:description",
+        content: "Your next step and a starter checklist for getting tax help.",
+      },
     ],
   }),
   component: PlanPage,
@@ -45,24 +59,41 @@ function scrollToId(id: string) {
 }
 
 function PlanPage() {
-  const { plan, hydrated, welcomeBack, dismissWelcome, update, reset } = usePlan();
+  const { plan, hydrated, welcomeBack, dismissWelcome, update, reset, loadSample, leaveSample } =
+    usePlan();
   const navigate = useNavigate();
   const [explainItem, setExplainItem] = useState<ChecklistItemRecord | null>(null);
   const [deadlines, setDeadlines] = useState<OfficialDeadline[] | null>(null);
 
   useEffect(() => {
-    getVerifiedDeadlines().then(setDeadlines);
+    let active = true;
+    getVerifiedDeadlines()
+      .then((result) => {
+        if (active) setDeadlines(result);
+      })
+      .catch(() => {
+        if (active) setDeadlines([]);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   if (!hydrated) {
-    return <p className="text-lg text-muted-foreground" role="status">Loading your plan…</p>;
+    return (
+      <p className="text-lg text-muted-foreground" role="status">
+        Loading your plan…
+      </p>
+    );
   }
 
   if (!plan.intakeComplete) {
     return (
       <div className="max-w-2xl">
         <h1 className="text-4xl font-bold">You don't have a plan yet</h1>
-        <p className="mt-4 text-lg text-muted-foreground">Answer two short questions and we'll set out your next step.</p>
+        <p className="mt-4 text-lg text-muted-foreground">
+          Answer two short questions and we'll set out your next step.
+        </p>
         <Button size="lg" className="mt-8" asChild>
           <Link to="/intake">Get started</Link>
         </Button>
@@ -81,7 +112,7 @@ function PlanPage() {
         ? "You said you'd like someone to help. This IRS page describes free, in-person preparation by trained volunteers for people who qualify. It's an option to explore."
         : "Not sure yet? This IRS page describes free help from trained volunteers, and is a good place to look around first. It's an option to explore.";
 
-  const setStatus = (id: string, s: "todo" | "ready" | "help") =>
+  const setStatus = (id: string, s: ItemStatus) =>
     update((p) => ({ ...p, checklist: { ...p.checklist, [id]: s } }));
 
   const stages = [
@@ -100,24 +131,39 @@ function PlanPage() {
             <Info className="mr-2 inline size-5 align-[-3px] text-attention" aria-hidden />
             Sample plan — a fictional demo with example progress.
           </p>
-          <Button variant="outline" onClick={() => { reset(); navigate({ to: "/" }); }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              leaveSample();
+              navigate({ to: "/" });
+            }}
+          >
             Leave sample
           </Button>
         </div>
       )}
       {welcomeBack && (
-        <div role="status" className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-primary-soft p-4">
+        <div
+          role="status"
+          className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-primary-soft p-4"
+        >
           <p className="font-bold">Welcome back. Here's where you left off.</p>
-          <Button variant="ghost" onClick={dismissWelcome}>Dismiss</Button>
+          <Button variant="ghost" onClick={dismissWelcome}>
+            Dismiss
+          </Button>
         </div>
       )}
 
+      <p className="eyebrow mb-3">Your personal preparation plan</p>
       <h1 className="text-4xl font-bold sm:text-5xl">Get ready for tax help</h1>
+      <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+        One thing at a time. You can pause and come back whenever you need.
+      </p>
 
       {/* Next step */}
       <section
         aria-labelledby="next-title"
-        className="mt-10 rounded-xl border-2 border-primary bg-card p-7 shadow-focus-card sm:p-10"
+        className="journey-card mt-8 rounded-xl border bg-card p-6 shadow-focus-card sm:p-8"
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 id="next-title" className="text-sm font-bold uppercase tracking-wider text-primary">
@@ -126,7 +172,17 @@ function PlanPage() {
           <div className="flex items-center gap-3">
             <div className="flex gap-1.5" aria-hidden>
               {stages.map((s) => (
-                <span key={s.n} className={cn("h-2 w-8 rounded-full", s.done ? "bg-primary" : s.n === next.stage && next.kind !== "complete" ? "bg-primary/40" : "bg-border-strong")} />
+                <span
+                  key={s.n}
+                  className={cn(
+                    "h-2 w-8 rounded-full",
+                    s.done
+                      ? "bg-primary"
+                      : s.n === next.stage && next.kind !== "complete"
+                        ? "bg-primary/40"
+                        : "bg-border-strong",
+                  )}
+                />
               ))}
             </div>
             <p className="text-base font-bold text-muted-foreground">{done} of 3 stages done</p>
@@ -135,17 +191,27 @@ function PlanPage() {
 
         {next.kind === "start" && (
           <>
-            <p className="mt-4 text-2xl font-bold sm:text-3xl">Look at the official starting point on IRS.gov</p>
+            <p className="mt-4 text-2xl font-bold sm:text-3xl">
+              Look at the official starting point on IRS.gov
+            </p>
             <p className="mt-3 text-lg text-muted-foreground">
-              Open the page, read what it offers, then come back and mark this step done. Opening it doesn't complete anything.
+              Open the page, read what it offers, then come back and mark this step done. Opening it
+              doesn't complete anything.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button size="lg" asChild>
                 <a href={start.url} target="_blank" rel="noopener noreferrer">
-                  Open IRS.gov <ExternalLink aria-hidden /><span className="sr-only">(opens in a new tab)</span>
+                  Open IRS.gov <ExternalLink aria-hidden />
+                  <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </Button>
-              <Button size="lg" variant="outline" onClick={() => update((p) => ({ ...p, stagesDone: { ...p.stagesDone, start: true } }))}>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() =>
+                  update((p) => ({ ...p, stagesDone: { ...p.stagesDone, start: true } }))
+                }
+              >
                 <CheckCircle2 aria-hidden /> I've completed this step
               </Button>
             </div>
@@ -159,9 +225,13 @@ function PlanPage() {
             <p className="mt-3 text-lg text-muted-foreground">{nextItem.why}</p>
             <div className="mt-7 flex flex-wrap gap-3">
               {next.needsHelp ? (
-                <Button size="lg" onClick={() => setExplainItem(nextItem)}>Explain this</Button>
+                <Button size="lg" onClick={() => setExplainItem(nextItem)}>
+                  Explain this
+                </Button>
               ) : (
-                <Button size="lg" onClick={() => scrollToId(`item-${nextItem.id}`)}>Go to this item</Button>
+                <Button size="lg" onClick={() => scrollToId(`item-${nextItem.id}`)}>
+                  Go to this item
+                </Button>
               )}
             </div>
           </>
@@ -170,15 +240,23 @@ function PlanPage() {
           <>
             <p className="mt-4 text-2xl font-bold sm:text-3xl">Continue with the provider</p>
             <p className="mt-3 text-lg text-muted-foreground">
-              You've gathered your starter items. Use the official site to choose a provider and continue there. Come back and mark this done when you have.
+              You've gathered your starter items. Use the official site to choose a provider and
+              continue there. Come back and mark this done when you have.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button size="lg" asChild>
                 <a href={start.url} target="_blank" rel="noopener noreferrer">
-                  Open IRS.gov <ExternalLink aria-hidden /><span className="sr-only">(opens in a new tab)</span>
+                  Open IRS.gov <ExternalLink aria-hidden />
+                  <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </Button>
-              <Button size="lg" variant="outline" onClick={() => update((p) => ({ ...p, stagesDone: { ...p.stagesDone, provider: true } }))}>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() =>
+                  update((p) => ({ ...p, stagesDone: { ...p.stagesDone, provider: true } }))
+                }
+              >
                 <CheckCircle2 aria-hidden /> I've completed this step
               </Button>
             </div>
@@ -190,25 +268,33 @@ function PlanPage() {
               <CheckCircle2 className="size-8" aria-hidden /> Preparation complete
             </p>
             <p className="mt-3 text-lg text-muted-foreground">
-              You've finished the preparation steps in this plan. Keep following your provider's instructions.
+              You've finished the preparation steps in this plan. Keep following your provider's
+              instructions.
             </p>
           </>
         )}
       </section>
 
       {/* Stages */}
-      <ol className="mt-14 space-y-12">
+      <h2 className="mt-12 text-2xl font-bold">Your plan, step by step</h2>
+      <ol className="mt-7 space-y-10">
         <Stage n={1} title={stages[0]!.title} done={stages[0]!.done} current={next.stage === 1}>
           <ResourceCard source={start} why={whyStart} />
           {stages[0]!.done && (
-            <UndoButton label="Mark step 1 as not done" onClick={() => update((p) => ({ ...p, stagesDone: { ...p.stagesDone, start: false } }))} />
+            <UndoButton
+              label="Mark step 1 as not done"
+              onClick={() =>
+                update((p) => ({ ...p, stagesDone: { ...p.stagesDone, start: false } }))
+              }
+            />
           )}
         </Stage>
 
         <Stage n={2} title={stages[1]!.title} done={stages[1]!.done} current={next.stage === 2}>
           <p className="text-muted-foreground">
             This is a starter list to help you prepare, not a complete list for your situation.
-            {firstTime && " Since this may be your first time filing, it's fine if you don't have last year's return."}
+            {firstTime &&
+              " Since this may be your first time filing, it's fine if you don't have last year's return."}
           </p>
           <ul className="mt-4 space-y-3">
             {CHECKLIST.map((item) => (
@@ -230,27 +316,46 @@ function PlanPage() {
           </div>
         </Stage>
 
-        <Stage n={3} title={stages[2]!.title} done={stages[2]!.done} current={next.stage === 3 && next.kind !== "complete"}>
-          <p>When you've prepared, continue on the official site with the provider you choose. ClearStep doesn't file anything for you.</p>
+        <Stage
+          n={3}
+          title={stages[2]!.title}
+          done={stages[2]!.done}
+          current={next.stage === 3 && next.kind !== "complete"}
+        >
+          <p>
+            When you've prepared, continue on the official site with the provider you choose.
+            ClearStep doesn't file anything for you.
+          </p>
           {stages[2]!.done && (
-            <UndoButton label="Mark step 3 as not done" onClick={() => update((p) => ({ ...p, stagesDone: { ...p.stagesDone, provider: false } }))} />
+            <UndoButton
+              label="Mark step 3 as not done"
+              onClick={() =>
+                update((p) => ({ ...p, stagesDone: { ...p.stagesDone, provider: false } }))
+              }
+            />
           )}
         </Stage>
       </ol>
 
       {/* Reminder */}
       <section aria-labelledby="reminder-title" className="mt-16 rounded-xl border bg-card p-7">
-        <h2 id="reminder-title" className="text-2xl font-bold">Your reminder</h2>
-        <p className="mt-2 text-muted-foreground">Pick a date to come back to this plan. This is your own reminder, not an official date.</p>
+        <h2 id="reminder-title" className="text-2xl font-bold">
+          Your reminder
+        </h2>
+        <p className="mt-2 text-muted-foreground">
+          Pick a date to come back to this plan. This is your own reminder, not an official date.
+        </p>
         <div className="mt-5 flex flex-wrap items-end gap-3">
           <div>
-            <label htmlFor="reminder" className="block font-bold">Reminder date</label>
+            <label htmlFor="reminder" className="block font-bold">
+              Reminder date
+            </label>
             <input
               id="reminder"
               type="date"
               value={plan.reminderDate ?? ""}
               onChange={(e) => update((p) => ({ ...p, reminderDate: e.target.value || null }))}
-              className="mt-1 min-h-12 rounded-md border border-input bg-card px-3 text-base text-foreground"
+              className="mt-1 min-h-12 max-w-full rounded-md border border-input bg-card px-3 text-base text-foreground"
             />
           </div>
           <Button
@@ -279,7 +384,9 @@ function PlanPage() {
           ) : (
             <ul>
               {deadlines.map((d) => (
-                <li key={d.date}>{d.label}: {d.date} (Official source: {getSource(d.sourceId).domain})</li>
+                <li key={d.date}>
+                  {d.label}: {d.date} (Official source: {getSource(d.sourceId).domain})
+                </li>
               ))}
             </ul>
           )}
@@ -289,20 +396,30 @@ function PlanPage() {
       <div className="mt-10">
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost"><RotateCcw aria-hidden /> Reset sample</Button>
+            <Button variant="ghost">
+              <RotateCcw aria-hidden /> {plan.isSample ? "Reset sample" : "Reset my plan"}
+            </Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="bg-card">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-2xl">Reset this plan?</AlertDialogTitle>
               <AlertDialogDescription className="text-base text-muted-foreground">
-                This clears your answers, checklist, and reminder saved in this browser.
+                {plan.isSample
+                  ? "This restores the fictional example. Your own saved plan will stay unchanged."
+                  : "This clears your answers, checklist, and reminder saved in this browser."}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="min-h-12 text-base">Keep my plan</AlertDialogCancel>
               <AlertDialogAction
                 className="min-h-12 bg-destructive text-base text-destructive-foreground hover:bg-destructive/90"
-                onClick={() => { reset(); navigate({ to: "/" }); }}
+                onClick={() => {
+                  if (plan.isSample) loadSample();
+                  else {
+                    reset();
+                    navigate({ to: "/" });
+                  }
+                }}
               >
                 Reset
               </AlertDialogAction>
@@ -316,12 +433,30 @@ function PlanPage() {
   );
 }
 
-function Stage({ n, title, done, current, children }: { n: number; title: string; done: boolean; current: boolean; children: React.ReactNode }) {
+function Stage({
+  n,
+  title,
+  done,
+  current,
+  children,
+}: {
+  n: number;
+  title: string;
+  done: boolean;
+  current: boolean;
+  children: React.ReactNode;
+}) {
   const Icon = done ? CheckCircle2 : current ? CircleDot : Circle;
   return (
     <li>
       <h3 className="flex items-center gap-3 text-2xl font-bold">
-        <Icon className={cn("size-7 shrink-0", done ? "text-success" : current ? "text-primary" : "text-muted-foreground")} aria-hidden />
+        <Icon
+          className={cn(
+            "size-7 shrink-0",
+            done ? "text-success" : current ? "text-primary" : "text-muted-foreground",
+          )}
+          aria-hidden
+        />
         <span>
           {n}. {title}
           <span className="sr-only"> — {done ? "done" : current ? "current" : "not started"}</span>
@@ -334,7 +469,11 @@ function Stage({ n, title, done, current, children }: { n: number; title: string
 
 function UndoButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="mt-3 inline-flex min-h-12 items-center font-bold text-primary underline">
+    <button
+      type="button"
+      onClick={onClick}
+      className="mt-3 inline-flex min-h-12 items-center font-bold text-primary underline"
+    >
       {label}
     </button>
   );

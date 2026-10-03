@@ -1,24 +1,45 @@
-# Pixel Perfect
+# ClearStep
 
-Implement exactly the screenshot and nothing else
+Government paperwork, one clear next step.
 
-This project was built with [Lovable](https://lovable.dev).
+An accessible tax-help preparation prototype for people with low confidence using government websites. The frontend includes a two-question intake, official-resource cards, contextual explanations, a starter checklist, personal calendar reminders, and browser-local progress.
 
-## Build with Lovable
+## Run locally
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/09b89e91-685f-4787-955f-882edd1b1854).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requires Node.js 22.12+ and Bun 1.3+ (the committed lockfile is `bun.lock`).
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+bun install --frozen-lockfile
+bun run dev
 ```
+
+Open http://127.0.0.1:3000. No account, API key, or environment variables are needed for the prototype.
+
+```sh
+bun run typecheck
+bun run test
+bun run lint
+bun run build
+bun run start
+```
+
+`build` produces a Node server in `.output/`; `start` serves that build. Set `PORT` when another app already uses port 3000. Development uses TanStack Start, React 19, TypeScript, Tailwind 4, and Vite. Keep `bun.lock` committed and use one package manager to avoid competing lockfiles.
+
+## Current scope
+
+- Three screens: `/`, `/intake`, `/plan`.
+- Human-help and online-filing preferences lead to distinct IRS resources.
+- Explanations are labeled, prewritten fixtures. There is no live AI service yet.
+- Source review dates remain unset pending the content owner's review.
+- No official deadline is supplied. Calendar exports are personal reminders.
+- Checklist completion means preparation, never submission or tax filing.
+- Progress is stored only in this browser. Sample mode does not overwrite a personal plan and is intentionally not persisted across reloads.
+- Optional items can be marked as not applicable. Provider-specific requirements still need review.
+
+See [TEAM_HANDOFF.md](TEAM_HANDOFF.md) for exact files, interfaces, and remaining work for Persons 2–4.
+
+## Design
+
+Warm neutral surfaces, navy text, teal actions, Atkinson Hyperlegible, generous targets, visible focus, and reduced-motion support. The original ClearStep stair-and-arrow mark lives in `src/components/clearstep/Brand.tsx`; its favicon is `public/favicon.svg`.
+
+Google Fonts is optional at runtime: the interface falls back to the system sans-serif font when unavailable.

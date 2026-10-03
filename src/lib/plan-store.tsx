@@ -1,9 +1,17 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { CHECKLIST } from "@/data/checklist";
 
 export type HelpChoice = "person" | "online" | "unsure";
 export type FirstTime = "yes" | "no" | "unsure";
-export type ItemStatus = "todo" | "ready" | "help";
+export type ItemStatus = "todo" | "ready" | "help" | "skipped";
 
 /** Only non-sensitive task progress is stored. */
 export interface PlanState {
@@ -17,7 +25,6 @@ export interface PlanState {
 }
 
 const KEY = "clearstep.plan.v1";
-const SESSION_KEY = "clearstep.session";
 const TEXT_KEY = "clearstep.largeText";
 
 const emptyChecklist = () => Object.fromEntries(CHECKLIST.map((i) => [i.id, "todo" as ItemStatus]));
@@ -49,6 +56,7 @@ interface Ctx {
   update: (fn: (p: PlanState) => PlanState) => void;
   startFresh: () => void;
   loadSample: () => void;
+  leaveSample: () => void;
   reset: () => void;
   largeText: boolean;
   setLargeText: (v: boolean) => void;
@@ -61,19 +69,27 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [welcomeBack, setWelcomeBack] = useState(false);
   const [largeText, setLargeTextState] = useState(false);
-  const skipSave = useRef(true);
+  const savedPlan = useRef<PlanState>(initialPlan());
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PlanState;
-        if (parsed.version === 1) {
-          setPlan({ ...initialPlan(), ...parsed, checklist: { ...emptyChecklist(), ...parsed.checklist } });
-          if (parsed.intakeComplete && !sessionStorage.getItem(SESSION_KEY)) setWelcomeBack(true);
+        if (parsed.version === 1 && parsed.answers && parsed.stagesDone && !parsed.isSample) {
+          setPlan({
+            ...initialPlan(),
+            ...parsed,
+            checklist: { ...emptyChecklist(), ...parsed.checklist },
+          });
+          savedPlan.current = {
+            ...initialPlan(),
+            ...parsed,
+            checklist: { ...emptyChecklist(), ...parsed.checklist },
+          };
+          if (parsed.intakeComplete) setWelcomeBack(true);
         }
       }
-      sessionStorage.setItem(SESSION_KEY, "1");
       setLargeTextState(localStorage.getItem(TEXT_KEY) === "1");
     } catch {
       /* storage unavailable: continue without persistence */
@@ -82,11 +98,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!hydrated) return;
-    if (skipSave.current) {
-      skipSave.current = false;
-      return;
-    }
+    if (!hydrated || plan.isSample) return;
+    savedPlan.current = plan;
     try {
       localStorage.setItem(KEY, JSON.stringify(plan));
     } catch {
@@ -116,6 +129,10 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     setWelcomeBack(false);
     setPlan(samplePlan());
   }, []);
+  const leaveSample = useCallback(() => {
+    setWelcomeBack(false);
+    setPlan(savedPlan.current);
+  }, []);
   const reset = useCallback(() => {
     setWelcomeBack(false);
     setPlan(initialPlan());
@@ -136,6 +153,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         update,
         startFresh,
         loadSample,
+        leaveSample,
         reset,
         largeText,
         setLargeText,

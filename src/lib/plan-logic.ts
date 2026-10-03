@@ -6,7 +6,9 @@ export function startingSourceId(help: HelpChoice | null): string {
 }
 
 export function prepDone(plan: PlanState) {
-  return CHECKLIST.every((i) => plan.checklist[i.id] === "ready");
+  return CHECKLIST.every(
+    (i) => plan.checklist[i.id] === "ready" || (i.optional && plan.checklist[i.id] === "skipped"),
+  );
 }
 
 export type NextStep =
