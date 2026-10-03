@@ -44,5 +44,5 @@ export const SOURCES: Record<string, SourceRecord> = {
 };
 
 export function getSource(id: string): SourceRecord {
-  return SOURCES[id];
+  return SOURCES[id]!;
 }

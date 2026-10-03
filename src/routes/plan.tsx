@@ -198,14 +198,14 @@ function PlanPage() {
 
       {/* Stages */}
       <ol className="mt-14 space-y-12">
-        <Stage n={1} title={stages[0].title} done={stages[0].done} current={next.stage === 1}>
+        <Stage n={1} title={stages[0]!.title} done={stages[0]!.done} current={next.stage === 1}>
           <ResourceCard source={start} why={whyStart} />
-          {stages[0].done && (
+          {stages[0]!.done && (
             <UndoButton label="Mark step 1 as not done" onClick={() => update((p) => ({ ...p, stagesDone: { ...p.stagesDone, start: false } }))} />
           )}
         </Stage>
 
-        <Stage n={2} title={stages[1].title} done={stages[1].done} current={next.stage === 2}>
+        <Stage n={2} title={stages[1]!.title} done={stages[1]!.done} current={next.stage === 2}>
           <p className="text-muted-foreground">
             This is a starter list to help you prepare, not a complete list for your situation.
             {firstTime && " Since this may be your first time filing, it's fine if you don't have last year's return."}
@@ -215,7 +215,7 @@ function PlanPage() {
               <ChecklistItem
                 key={item.id}
                 item={item}
-                status={plan.checklist[item.id]}
+                status={plan.checklist[item.id] ?? "todo"}
                 isNext={next.kind === "item" && next.itemId === item.id}
                 onStatus={(s) => setStatus(item.id, s)}
                 onExplain={() => setExplainItem(item)}
@@ -230,9 +230,9 @@ function PlanPage() {
           </div>
         </Stage>
 
-        <Stage n={3} title={stages[2].title} done={stages[2].done} current={next.stage === 3 && next.kind !== "complete"}>
+        <Stage n={3} title={stages[2]!.title} done={stages[2]!.done} current={next.stage === 3 && next.kind !== "complete"}>
           <p>When you've prepared, continue on the official site with the provider you choose. ClearStep doesn't file anything for you.</p>
-          {stages[2].done && (
+          {stages[2]!.done && (
             <UndoButton label="Mark step 3 as not done" onClick={() => update((p) => ({ ...p, stagesDone: { ...p.stagesDone, provider: false } }))} />
           )}
         </Stage>

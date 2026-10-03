@@ -53,7 +53,7 @@ function IntakePage() {
     headingRef.current?.focus();
   }, [step]);
 
-  const q = QUESTIONS[step];
+  const q = QUESTIONS[step]!;
   const value = plan.answers[q.key];
 
   const onContinue = () => {
