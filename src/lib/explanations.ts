@@ -1,29 +1,42 @@
-import { getExplanationContext } from "@/data/explanation-context";
 import type { IntakeAnswers } from "@/data/routing";
+import {
+  explanationRequest,
+  sampleExplanation,
+  validateModelAnswer,
+  type Explanation,
+} from "./explanation-contract";
+export type { Explanation } from "./explanation-contract";
 
-export interface Explanation {
-  itemId: string;
-  isSample: boolean;
-  plainLanguage: string;
-  nextSteps: string[];
-  sourceId: string;
-  /** Additional reviewed citations supporting next actions. */
-  sourceIds?: string[];
-}
-
-/** Reviewed static fallback. Person 3 replaces this adapter with a server call. */
 export async function getExplanation(
   itemId: string,
   answers?: IntakeAnswers,
 ): Promise<Explanation | null> {
-  const context = getExplanationContext(itemId, answers);
-  if (!context) return null;
-  return {
-    itemId,
-    isSample: true,
-    plainLanguage: context.item.why,
-    nextSteps: [context.item.helpAction.text],
-    sourceId: context.item.sourceId,
-    sourceIds: context.sources.map((source) => source.id),
-  };
+  const parsed = explanationRequest.safeParse({ itemId, answers });
+  if (!parsed.success) return null;
+  const fallback = sampleExplanation(parsed.data);
+  if (!fallback) return null;
+  try {
+    const response = await fetch("/api/explanations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed.data),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) return fallback;
+    const result = await response.json();
+    if (result?.itemId !== itemId || result.isSample !== false) return fallback;
+    return (
+      validateModelAnswer(
+        {
+          supported: true,
+          plainLanguage: result.plainLanguage,
+          nextSteps: result.nextSteps,
+          sourceIds: result.sourceIds,
+        },
+        parsed.data,
+      ) ?? fallback
+    );
+  } catch {
+    return fallback;
+  }
 }

@@ -62,15 +62,15 @@ export function ExplainPanel({
       >
         <SheetHeader className="p-0 pr-12 text-left">
           <p className="text-sm font-bold uppercase tracking-wide text-attention">
-            {data && state === "ready" && !data.isSample
-              ? "Source-backed explanation"
-              : "Sample explanation"}
+            {data && state === "ready" && !data.isSample ? "AI explanation" : "Sample explanation"}
           </p>
           <SheetTitle className="text-2xl font-bold text-foreground">{item?.label}</SheetTitle>
           <SheetDescription className="text-base text-muted-foreground">
-            {data && state === "ready" && !data.isSample
-              ? "Based on the source shown below. Not personalized advice."
-              : "Prewritten for this prototype. Not personalized advice."}
+            {state !== "ready"
+              ? "Help understanding this preparation step."
+              : data && !data.isSample
+                ? "AI-generated from reviewed IRS information. Check the official source; this is not personalized advice."
+                : "Prewritten for this prototype. Not personalized advice."}
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-6" aria-live="polite">

@@ -2,7 +2,7 @@
 
 ## Frontend baseline (Person 1)
 
-The screens, logo, navigation, source cards, intake validation, explanation drawer, checklist controls, reminders, empty/error states, text-size toggle, and reset confirmation are integrated. Use this working baseline rather than regenerating the app. Sources and checklist content are now reviewed for the defined scope; explanations remain labeled static samples for Person 3 to replace.
+The screens, logo, navigation, source cards, intake validation, explanation drawer, checklist controls, reminders, empty/error states, text-size toggle, and reset confirmation are integrated. Use this working baseline rather than regenerating the app. Sources and checklist content are now reviewed for the defined scope; the AI explanation endpoint is integrated with labelled static fallbacks.
 
 Do not independently rename shared IDs, add extra journeys, or rebuild shared pages. Agree interface changes with Person 1 first. Integrate each feature early in a small commit.
 
@@ -22,23 +22,13 @@ Original IDs remain stable: `photo-id`, `ssn-cards`, `income-forms`, `last-retur
 
 Both routes are integrated into the page, progress calculations, and fallback explanations. Previously saved plans receive missing IDs as unfinished work. Person 2's implementation is ready; no backend or credentials are needed for it.
 
-## Person 3: explanations
+## Person 3: complete — explanation implementation
 
-Own `src/lib/explanations.ts` and your new server-only endpoint. Coordinate presentation changes to `src/components/clearstep/ExplainPanel.tsx` with Person 1.
+Implemented in `src/server/explanations.ts` and routed by `src/server.ts` at `POST /api/explanations`. The adapter in `src/lib/explanations.ts` preserves `getExplanation(itemId, answers)`. Shared input/output validation is in `src/lib/explanation-contract.ts`.
 
-Preserve the existing adapter:
+The server resolves `getExplanationContext`, sends only reviewed evidence to OpenAI, validates schema and item-specific citations, and returns labelled samples on unavailable/unsupported service results. The browser validates responses again. Credentials stay server-side in `.env` or hosting environment variables. The panel labels generated answers as AI and never labels fallback content live.
 
-```ts
-getExplanation(itemId: string, answers?: IntakeAnswers): Promise<Explanation | null>
-// Explanation:
-// { itemId, isSample: boolean, plainLanguage, nextSteps: string[], sourceId, sourceIds?: string[] }
-```
-
-The panel already supports loading, failure, missing answers, sample/live labels, and official source links. Unknown source IDs are rejected by the panel. Return null for unsupported answers. Multiple citations are already supported with optional `sourceIds`. Resolve links using Person 2's source records, not model-generated URLs.
-
-**Start here:** call `getExplanationContext(itemId, answers)` in your server endpoint to obtain the selected item and its reviewed source evidence. The page passes the intake answers to the adapter. Preserve those choices so online users receive online explanations. Validate inputs and restrict returned citations to the context's source IDs.
-
-Keep credentials on the server. No keys are needed to run the current fixtures. Leave `isSample: true` on fallback fixtures; set false only for actual supported service answers. Use only approved passages and test unsupported requests, invalid source IDs, and outages.
+Automated coverage includes success, cache, invalid/mismatched citations, unsupported answers, refusals, outage/timeout, request validation, origin checks, body limits and request budget. Live upstream validation currently reaches the API but the supplied account reports exhausted credit; see `docs/PROJECT_STATUS.md`. No live success is claimed until a funded key is tested.
 
 ## Person 4: progress, reminders, usability, demo
 

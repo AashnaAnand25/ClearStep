@@ -72,7 +72,8 @@ function StartPage() {
             Get help with my taxes
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Find a place to start and a simple plan to get ready.
+            Find official IRS help and prepare for your next step. ClearStep does not file your
+            taxes or determine eligibility.
           </p>
           <ol className="my-7 space-y-4 border-y py-6 text-base">
             {[
