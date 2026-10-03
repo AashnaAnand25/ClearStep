@@ -26,6 +26,19 @@ export interface PlanState {
 
 import { clearPlan, readPlan, writePlan } from "./plan-persistence";
 const TEXT_KEY = "clearstep.largeText";
+const SETTINGS_KEY = "clearstep.accessibility";
+
+export interface AccessibilitySettings {
+  textSize: "default" | "large";
+  highContrast: boolean;
+  reducedMotion: boolean;
+}
+
+const defaultAccessibility: AccessibilitySettings = {
+  textSize: "default",
+  highContrast: false,
+  reducedMotion: false,
+};
 
 const emptyChecklist = () =>
   Object.fromEntries(ALL_CHECKLIST_ITEMS.map((i) => [i.id, "todo" as ItemStatus]));
@@ -59,8 +72,8 @@ interface Ctx {
   loadSample: () => void;
   leaveSample: () => void;
   reset: () => void;
-  largeText: boolean;
-  setLargeText: (v: boolean) => void;
+  accessibility: AccessibilitySettings;
+  setAccessibility: (settings: AccessibilitySettings) => void;
 }
 
 const PlanContext = createContext<Ctx | null>(null);
@@ -69,7 +82,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   const [plan, setPlan] = useState<PlanState>(initialPlan);
   const [hydrated, setHydrated] = useState(false);
   const [welcomeBack, setWelcomeBack] = useState(false);
-  const [largeText, setLargeTextState] = useState(false);
+  const [accessibility, setAccessibilityState] =
+    useState<AccessibilitySettings>(defaultAccessibility);
   const savedPlan = useRef<PlanState>(initialPlan());
 
   useEffect(() => {
@@ -80,7 +94,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         savedPlan.current = restored;
         setWelcomeBack(restored.intakeComplete);
       }
-      setLargeTextState(localStorage.getItem(TEXT_KEY) === "1");
+      const savedAccessibility = localStorage.getItem(SETTINGS_KEY);
+      if (savedAccessibility) {
+        setAccessibilityState({ ...defaultAccessibility, ...JSON.parse(savedAccessibility) });
+      } else if (localStorage.getItem(TEXT_KEY) === "1") {
+        setAccessibilityState({ ...defaultAccessibility, textSize: "large" });
+      }
     } catch {
       /* storage unavailable: continue without persistence */
     }
@@ -98,13 +117,15 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }, [plan, hydrated]);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("text-large", largeText);
-  }, [largeText]);
+    document.documentElement.classList.toggle("text-large", accessibility.textSize === "large");
+    document.documentElement.classList.toggle("high-contrast", accessibility.highContrast);
+    document.documentElement.classList.toggle("reduce-motion", accessibility.reducedMotion);
+  }, [accessibility]);
 
-  const setLargeText = useCallback((v: boolean) => {
-    setLargeTextState(v);
+  const setAccessibility = useCallback((settings: AccessibilitySettings) => {
+    setAccessibilityState(settings);
     try {
-      localStorage.setItem(TEXT_KEY, v ? "1" : "0");
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch {
       /* ignore */
     }
@@ -145,8 +166,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         loadSample,
         leaveSample,
         reset,
-        largeText,
-        setLargeText,
+        accessibility,
+        setAccessibility,
       }}
     >
       {children}

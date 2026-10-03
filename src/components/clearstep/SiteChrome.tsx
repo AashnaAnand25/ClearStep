@@ -1,10 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { ClipboardList, Type } from "lucide-react";
+import { Accessibility, ClipboardList, LogIn } from "lucide-react";
 import { Brand } from "./Brand";
-import { usePlan } from "@/lib/plan-store";
 
 export function SiteHeader() {
-  const { largeText, setLargeText } = usePlan();
   return (
     <header className="border-b bg-card">
       <div className="mx-auto flex max-w-[1080px] flex-wrap items-center justify-between gap-3 px-5 py-4">
@@ -23,15 +21,21 @@ export function SiteHeader() {
             <ClipboardList className="size-5" aria-hidden />
             My plan
           </Link>
-          <button
-            type="button"
-            aria-pressed={largeText}
-            onClick={() => setLargeText(!largeText)}
-            className="inline-flex min-h-12 items-center gap-2 rounded-md border border-border-strong px-3 font-bold text-foreground hover:bg-accent aria-pressed:bg-primary-soft aria-pressed:border-primary"
+          <Link
+            to="/settings"
+            className="inline-flex min-h-12 items-center gap-2 rounded-md border border-border-strong px-3 font-bold text-foreground hover:bg-accent"
+            activeProps={{ "aria-current": "page", className: "bg-primary-soft" }}
           >
-            <Type className="size-5" aria-hidden />
-            Larger text
-          </button>
+            <Accessibility className="size-5" aria-hidden />
+            Settings
+          </Link>
+          <Link
+            to="/login"
+            className="inline-flex min-h-12 items-center gap-2 rounded-md px-3 font-bold text-foreground hover:bg-accent"
+          >
+            <LogIn className="size-5" aria-hidden />
+            Sign in
+          </Link>
         </nav>
       </div>
     </header>
